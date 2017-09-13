@@ -29,6 +29,8 @@ object cfg {
     val ReceiveAll = "ReceiveAll"
     val DisableReceiveAll = "DisableReceiveAll"
     val FreeSpace="FreeSpace"
+    val Take_Pictures="take_pictures"
+    val Update_CameraSettings="Update_CameraSettings"
 
     //    address
     val ad_message = "com.iezview.message"
@@ -40,5 +42,12 @@ object cfg {
     val MESSAGE_PORT = "messagePort"
     val FILE_PORT = "filePort"
     val CLIENTS = "clients"
+    val ROOT = "server"
+    val CameraSetting="CameraSetting"
+
+    val  thumbW=204.0
+    val  teumbH=152.0
+    val  teumbSuffix="_thumb"
+
 
 }

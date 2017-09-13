@@ -52,3 +52,8 @@ class TaskStatusTest : View("Task Status Test") {
 }
 
 class TaskStatusApp : App(TaskStatusTest::class)
+
+
+fun main(args: Array<String>) {
+    println(3.0 / 500)
+}

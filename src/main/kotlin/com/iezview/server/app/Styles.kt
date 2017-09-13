@@ -10,6 +10,7 @@ import tornadofx.px
 class Styles : Stylesheet() {
     companion object {
         val heading by cssclass()
+        val driv by cssclass()
     }
 
     init {
@@ -22,5 +23,12 @@ class Styles : Stylesheet() {
         root{
             fill= Color.TRANSPARENT
         }
+
+        driv{
+            splitPaneDivider{
+
+            }
+        }
+
     }
 }

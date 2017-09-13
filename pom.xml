@@ -10,11 +10,20 @@
     <packaging>jar</packaging>
 
     <properties>
-        <kotlin.version>1.1.4-2</kotlin.version>
+        <kotlin.version>1.1.4-3</kotlin.version>
         <tornadofx.version>1.7.10</tornadofx.version>
         <junit.version>4.12</junit.version>
         <vertx.version>3.4.2</vertx.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental><!-- 启动增量编译功能-->
+        <main.class>com.iezview.server.app.MyAppKt</main.class>
+
     </properties>
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>http://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -32,6 +41,17 @@
             <artifactId>kotlin-test-junit</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>0.18</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-javafx</artifactId>
+            <version>0.18</version>
         </dependency>
 
         <dependency>
@@ -77,7 +97,11 @@
             <artifactId>vertx-tcp-eventbus-bridge</artifactId>
             <version>${vertx.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -95,7 +119,10 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                        <jvmTarget>1.8</jvmTarget>
+                            <jvmTarget>1.8</jvmTarget>
+                            <nowarn>true</nowarn>
+
+
                         </configuration>
                     </execution>
                     <execution>
@@ -104,6 +131,60 @@
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+                <executions>
+                    <!-- Replacing default-compile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Replacing default-testCompile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>java-compile</id>
+                        <phase>compile</phase>
+                        <goals> <goal>compile</goal> </goals>
+                    </execution>
+                    <execution>
+                        <id>java-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals> <goal>testCompile</goal> </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals> <goal>single</goal> </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${main.class}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

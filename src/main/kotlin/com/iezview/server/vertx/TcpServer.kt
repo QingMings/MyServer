@@ -1,16 +1,13 @@
 package com.iezview.server.vertx
 
 import com.iezview.server.controller.ClientController
-import com.iezview.server.view.Client
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.buffer.Buffer
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.core.net.NetServer
 import io.vertx.ext.bridge.BridgeOptions
 import io.vertx.ext.bridge.PermittedOptions
 import io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge
-import io.vertx.kotlin.core.json.get
 
 class TcpServer(clientController: ClientController) : AbstractVerticle() {
     val log = LoggerFactory.getLogger(TcpServer::class.java)

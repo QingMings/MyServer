@@ -15,14 +15,18 @@ class MyApp: App(MainView::class, Styles::class){
             fire(closeApplication())
     }
     init {
-
         Thread.setDefaultUncaughtExceptionHandler(DefaultErrorHandler())
     }
 
     override fun start(stage: Stage) {
 //        设置无窗体且背景透明
 //        stage.initStyle(StageStyle.TRANSPARENT)
+
         super.start(stage)
+//        stage.minWidth=1200.0
+//        stage.minWidth=1000.0
+//        stage.minWidth=1200.0
+//        stage.minWidth=850.0
 //          与上面一起达到透明窗体效果
 //        stage.apply {
 //            scene.fill=Color.TRANSPARENT

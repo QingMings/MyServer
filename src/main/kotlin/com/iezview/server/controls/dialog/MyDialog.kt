@@ -1,14 +1,16 @@
 package com.iezview.server.controls.dialog
 
+import javafx.scene.control.ButtonType
+import javafx.scene.control.Dialog
+import javafx.scene.control.Label
+import javafx.scene.control.TextArea
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
-import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
-import javafx.scene.Parent
-import javafx.scene.control.*
-import java.io.PrintWriter
-import java.io.StringWriter
 import javafx.scene.layout.Priority
 import javafx.stage.Modality
 import tornadofx.*
+import java.io.PrintWriter
+import java.io.StringWriter
 
 
 fun createExceptionDialog(th: Throwable): Dialog<ButtonType> {
@@ -58,5 +60,9 @@ fun main(args: Array<String>) {
 
 class  ExceptionDialog(th: Throwable):Fragment("程序异常"){
     override val root=hbox {  }
+
+}
+class  TestPane(): BorderPane(){
+
 
 }

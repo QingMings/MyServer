@@ -1,9 +1,10 @@
 package com.iezview.server.controls.toolbarbutton
 
 import javafx.beans.binding.Bindings
-import javafx.scene.Node
 import javafx.scene.control.Button
+import javafx.scene.control.ToggleButton
 import javafx.scene.control.ToolBar
+import javafx.scene.effect.ColorAdjust
 import javafx.scene.image.Image
 import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod
@@ -11,9 +12,16 @@ import javafx.scene.paint.RadialGradient
 import javafx.scene.paint.Stop
 import tornadofx.*
 
+/**
+ * 工具栏按钮自定义样式
+ */
 class ButtonStyle : Stylesheet() {
     companion object {
         val toolbtn by cssclass()
+        val viewtoolbtn by cssclass()
+        val segmentbtn by cssclass()
+        val firstbtn by cssclass()
+        val lastbtn by cssclass()
     }
 
     init {
@@ -31,11 +39,29 @@ class ButtonStyle : Stylesheet() {
                 borderColor += box(Color.web("#d2d2d2"))
                 backgroundColor += Color.web("#c0c0c0")
             }
-
+        }
+        viewtoolbtn {
+            borderWidth += box(1.px)
+            borderColor += box(Color.TRANSPARENT)
+//            padding = box(2.0.px, 1.0.px)
+            borderRadius += box(3.px)
         }
 
-    }
+        segmentbtn {
 
+            backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
+            backgroundRadius += box(0.px)
+            padding = box(0.4.em, 1.833333.em)
+        }
+        segmentbtn and firstbtn {
+            backgroundInsets = multi(box(1.px), box(1.px), box(2.px, 1.px, 1.px, 1.px))
+            backgroundRadius = multi(box(3.px, 0.px, 0.px, 3.px), box(2.px, 0.px, 0.px, 2.px), box(2.px, 0.px, 0.px, 2.px))
+        }
+        segmentbtn and lastbtn {
+            backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
+            backgroundRadius = multi(box(0.px, 3.px, 3.px, 0.px), box(0.px, 2.px, 2.px, 0.px), box(0.px, 2.px, 2.px, 0.px))
+        }
+    }
 }
 
 /**
@@ -46,12 +72,11 @@ class RunButton(text: String = "") : ToolBarButton(text) {
 
     var running by property(false)//是否运行
     fun runningProperty() = getProperty(RunButton::running)
-//    init {
-//        removeClass("button").addClass(ButtonStyle.toolbtn)
-//    }
-//    override fun getUserAgentStylesheet(): String = ButtonStyle().base64URL.toExternalForm()
 }
 
+/**
+ * 工具栏普通功能按钮
+ */
 open class ToolBarButton(text: String = "") : Button(text) {
     constructor() : this("")
 
@@ -62,6 +87,33 @@ open class ToolBarButton(text: String = "") : Button(text) {
     override fun getUserAgentStylesheet(): String = ButtonStyle().base64URL.toExternalForm()
 }
 
+open class ViewBarButton(text: String = "") : ToolBarButton(text) {
+    constructor() : this("")
+
+    init {
+        removeClass(ButtonStyle.toolbtn).addClass(ButtonStyle.viewtoolbtn)
+    }
+}
+
+enum class Prem {
+    Fisrt, Middle, Last
+}
+
+open class SegmentedButton(prem: Prem, text: String = "") : ToggleButton(text) {
+    init {
+        when (prem) {
+            Prem.Fisrt -> removeClass("button").addClass(ButtonStyle.segmentbtn).addClass(ButtonStyle.firstbtn)
+            Prem.Middle -> removeClass("button").addClass(ButtonStyle.segmentbtn)
+            Prem.Last -> removeClass("button").addClass(ButtonStyle.segmentbtn).addClass(ButtonStyle.lastbtn)
+        }
+    }
+
+    override fun getUserAgentStylesheet(): String=ButtonStyle().base64URL.toExternalForm()
+}
+
+/**
+ *
+ */
 fun ToolBar.runbutton(iconurl: String? = null, op: (RunButton.() -> Unit)? = null): RunButton {
     val button = RunButton()
     if (iconurl != null) {
@@ -92,28 +144,64 @@ fun ToolBar.runbutton(iconurl: String? = null, op: (RunButton.() -> Unit)? = nul
     return button
 }
 
-fun ToolBar.stopbutton( op: (RunButton.() -> Unit)? = null): RunButton {
+fun ToolBar.stopbutton(op: (RunButton.() -> Unit)? = null): RunButton {
     val button = RunButton()
 
-        button.apply {
-            button.graphic =imageview {
-                 imageProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(Image("icons/suspend@2x.png")).otherwise(Image("icons/suspend_disable@2x.png")))
-                fitWidth=16.0;fitHeight=16.0
-                 }
-            }
+    button.apply {
+        button.graphic = imageview {
+            imageProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(Image("icons/suspend@2x.png")).otherwise(Image("icons/suspend_disable@2x.png")))
+            fitWidth = 16.0;fitHeight = 16.0
+        }
+    }
 
     items.add(button)
     op?.invoke(button)
     return button
 }
+
+//fun ToolBar.stopbutton(op: (RunButton.() -> Unit)? = null): RunButton=toolbarbutton("icons/suspend@2x.png","icons/suspend_disable@2x.png",op)
 
 fun ToolBar.toolbarbutton(iconurl: String? = "", op: (ToolBarButton.() -> Unit)? = null): ToolBarButton {
     val button = ToolBarButton()
     if (iconurl != null)
         button.apply {
-            button.graphic = imageview(Image(iconurl), {fitHeight = 16.0 ;fitWidth = 16.0})
+            button.graphic = imageview(Image(iconurl), { fitHeight = 16.0;fitWidth = 16.0 })
         }
     items.add(button)
     op?.invoke(button)
     return button
 }
+fun ToolBar.toolbarbutton(enableIconurl: String? = "",disableIconurl: String? = "",op: (RunButton.() -> Unit)? = null): RunButton{
+    val button = RunButton()
+    button.apply {
+        button.graphic = imageview {
+            imageProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(Image(enableIconurl)).otherwise(Image(disableIconurl)))
+            fitWidth = 16.0;fitHeight = 16.0
+            effectProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(ColorAdjust(0.0,0.0,0.0,0.0)).otherwise(ColorAdjust(0.0,-1.0,0.4,0.0)))
+        }
+    }
+    items.add(button)
+    op?.invoke(button)
+    return button
+}
+
+
+fun ToolBar.viewbutton(iconurl: String? = "", op: (ViewBarButton.() -> Unit)? = null): ViewBarButton {
+    val button = ViewBarButton()
+    if (iconurl != null)
+        button.apply {
+            button.graphic = imageview(Image(iconurl), { fitHeight = 14.0;fitWidth = 14.0 })
+        }
+    items.add(button)
+    op?.invoke(button)
+    return button
+}
+
+fun ToolBar.segmentedbutton(op:(org.controlsfx.control.SegmentedButton.()->Unit)):org.controlsfx.control.SegmentedButton{
+    val  button =org.controlsfx.control.SegmentedButton()
+    items.add(button)
+    op.invoke(button)
+    return button
+}
+
+

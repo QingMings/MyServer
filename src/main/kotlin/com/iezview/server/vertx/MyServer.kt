@@ -1,7 +1,7 @@
 package com.iezview
 
-import com.iezview.server.controller.ClientController
 import com.iezview.server.app.cfg
+import com.iezview.server.controller.ClientController
 import com.iezview.server.util.utils
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
@@ -14,7 +14,6 @@ import io.vertx.core.net.NetSocket
 import io.vertx.ext.bridge.BridgeOptions
 import io.vertx.ext.bridge.PermittedOptions
 import io.vertx.ext.eventbus.bridge.tcp.TcpEventBusBridge
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * TcpServer  和  tcp-bridge的  分别在不同端口启动
@@ -31,7 +30,7 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
     lateinit var netClient: NetClient
     lateinit var bridge: TcpEventBusBridge
     lateinit var conf: JsonObject
-    var bufferStoreMap= ConcurrentHashMap<String,BufferStore>()
+//    var bufferStoreMap= ConcurrentHashMap<String,BufferStore>()
 
     override fun start(startedFuture: Future<Void>?){
         conf = config().getJsonObject("server")
@@ -39,8 +38,12 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
         bridge = TcpEventBusBridge.create(vertx, tcpBridgeConf())
         bridge.listen(conf.getInteger(cfg.MESSAGE_PORT), startFuture.completer())
 
-        startFuture.compose {
+        startFuture.compose { bridge->
+            bridge.apply {
+
+            }
             Future.future { socket: Future<NetSocket> ->
+
                 netClient = vertx.createNetClient()
                 netClient.connect(conf.getInteger(cfg.MESSAGE_PORT), "localhost", socket.completer())
             }
@@ -49,12 +52,19 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
             Future.future { server: Future<NetServer> ->
                 netServer = vertx.createNetServer()
                 netServer.connectHandler {socketServer->
-                 var bs=   BufferStore(vertx, socketServer, socket, conf)
-                    bufferStoreMap.put(socketServer.remoteAddress().host(),bs)
-
-                    socketServer.closeHandler {
-                        bufferStoreMap.remove(socketServer.remoteAddress().host())
+                    if(isreg(socketServer.remoteAddress().host())){
+                        var bs=   BufferStore(vertx, socketServer, socket, conf,cc)
+                    }else{
+                        socketServer.close()
+                        log.info("client [${socketServer.remoteAddress().host()}] 未注册，已终止连接")
                     }
+//                 var bs=   BufferStore(vertx, socketServer, socket, conf,cc)
+//                    bufferStoreMap.put(socketServer.remoteAddress().host(),bs)
+
+//                    socketServer.closeHandler {
+//                            log.info("aaa")
+////                        bufferStoreMap.remove(socketServer.remoteAddress().host())
+//                    }
                 }.listen(conf.getInteger(cfg.FILE_PORT), server.completer())
 
             }
@@ -81,40 +91,26 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
                         cfg.FreeSpace-> getFreeSpace(it)
                    }
         }
-//        vertx.eventBus().consumer<JsonObject>("com.iezview.publish"){
-//            println(it.body())
-//        }
+        vertx.eventBus().consumer<JsonObject>("com.iezview.publish"){
+            println(it.body())
+        }
 
     }
 
-//    private fun  enableReceiveAll(){
-//        bufferStoreMap.forEach{k,v->
-//            v.enableReceive=true
-//            println(v.enableReceive)
-//        }
-//    }
-//    private fun disableReceiveAll(){
-//        bufferStoreMap.forEach{k,v->
-//            v.enableReceive=false
-//            println(v.enableReceive)
-//        }
-//    }
-//    private  fun enableReceiveByAddress(remoteAddress:String){
-//        if (bufferStoreMap.contains(remoteAddress)) {
-//            bufferStoreMap[remoteAddress]!!.enableReceive=true
-//        }else{
-//            log.info("can't find BufferStore Instance from  bufferStoreMap by key:$remoteAddress")
-//        }
-//    }
+
     private  fun  getFreeSpace(it: Message<JsonObject>) {
-            var filesize=it.body().getInteger("fileSize")
+            var filesize=it.body().getInteger(cfg.FILE_SIZE)
         it.reply(JsonObject().put(cfg.message,cfg.FreeSpace).put(cfg.result,utils.canSave(filesize,conf.getString(cfg.SAVE_PATH))))
 //        vertx.eventBus().send("192.168.1.205",JsonObject().put(cfg.message,utils.checkFreeSpace(conf.getString(cfg.SAVE_PATH))))
 }
+
+    /**
+     * tcpBridge 配置
+     */
     private fun tcpBridgeConf(): BridgeOptions {
         var bridgeOptions = BridgeOptions()
         bridgeOptions.inboundPermitteds = arrayListOf(
-                PermittedOptions().setAddress("com.iezview.message") //[c]->[s] 消息发送
+                PermittedOptions().setAddress(cfg.ad_message) //[c]->[s] 消息发送
         )
         bridgeOptions.outboundPermitteds = loadClients()
 
@@ -129,7 +125,14 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
         return clients.flatMap { arrayListOf(PermittedOptions().setAddress(it as String)) }
 
     }
-
+    private fun  isreg(host:String):Boolean{
+        var isreg=false
+       var clients = conf.getJsonArray(cfg.CLIENTS)
+         clients.filter { it==host }.forEach {
+                 isreg=true
+         }
+        return isreg
+    }
     /**
      * 加载客户端IP配置
      */
@@ -140,10 +143,14 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
         return allOutPermittedOptions
     }
 
+
     override fun stop() {
         netClient.close()
         netServer.close()
         bridge.close()
         log.info("Server stop success!")
     }
+}
+fun TcpEventBusBridge.registerHandler(){
+
 }

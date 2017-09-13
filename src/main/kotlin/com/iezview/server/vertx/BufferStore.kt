@@ -1,40 +1,59 @@
 package com.iezview
 
 import com.iezview.server.app.cfg
+import com.iezview.server.controller.ClientController
+import com.iezview.server.model.Picture
+import com.iezview.server.util.MyTask
+import com.iezview.server.util.thumbName
 import io.vertx.core.Vertx
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.core.net.NetSocket
 import io.vertx.ext.eventbus.bridge.tcp.impl.protocol.FrameHelper
+import net.coobird.thumbnailator.Thumbnails
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.zip.CRC32
 import java.util.zip.CheckedInputStream
+import kotlinx.coroutines.experimental.javafx.JavaFx as UI
+
 
 /**
  * 使用buffer追加的方式实现，适合小于100M的小文件，大文件不适合
  */
-class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket, config: JsonObject) {
+class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket, config: JsonObject,cc:ClientController) {
     private var vertx = vertx
     private var socket = socketServer
     private var message = socketClient
     private var config = config
-    private var bigBuf = Buffer.buffer()
-    private var bigBufLen: Int = 0 // tempbufferLength
+    private var cc = cc
+    private var bigBuf =Buffer.buffer()
+    private var bigBufLen: Int= 0// tempbufferLength
+//    private fun bigBufProperty()=getProperty(BufferStore::bigBuf)
     private var states = 0 //初始状态     -1 ,累计buffer ,1 处理buffer  , 2 一个包接收完毕或者接收发生错误
     private var tempbuf = Buffer.buffer()
     private var fileInfo = JsonObject()
+    private lateinit var task:MyTask<Void>
     private val log = LoggerFactory.getLogger(BufferStore::class.java)
      var enableReceive=false
+    var   count=0
 
     init {
-        println("获得连接${socket.remoteAddress().host()} , socketHash:${socket.hashCode()} ")
+//        println("获得连接${socket.remoteAddress().host()} , socketHash:${socket.hashCode()} ")
+        log.info("client:[${socket.remoteAddress().host()}] 获得连接")
+        cc.remoteClientsProperty().value.filter { it.remoteAddress==socketServer.remoteAddress().host() }.forEach { it.onlineProperty().value=true }
+        socketServer.closeHandler {
+            log.info("client:[${socketServer.remoteAddress().host()}] 断开连接")
+            cc.remoteClientsProperty().value.filter { it.remoteAddress==socketServer.remoteAddress().host() }.forEach { it.onlineProperty().value=false }
+        }
         socketHandler()
     }
 
     private fun socketHandler() {
         socket.handler { buffer ->
+//            println(buffer)
+//            println("--------------------------------------------------------------------------------------")
             if (states == -1) {
                 bufferAppend(buffer)
                 return@handler
@@ -57,7 +76,13 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
             var fileInfoLength = tempbuf.getBuffer(cfg.Head, cfg.Head_Info).getInt(0)//获取文件信息长度
             if (tempbuf.length() > (cfg.Head_Info + fileInfoLength)) {//判断tempBuf长度是否包含了文件信息
                 fileInfo = tempbuf.getBuffer(cfg.Head_Info, cfg.Head_Info + fileInfoLength).toJsonObject()//得到文件信息
+                task= MyTask(fileInfo)
                 bigBufLen = fileInfo.getLong(cfg.FILE_SIZE).toInt()//得到文件的大小
+//                Platform.runLater {
+//                    task.currentfilesizeProperty().bind( )
+//                    Bindings.
+//                   cc.addtask(task)
+//                }
                 var dataLength = cfg.Head_Info + fileInfoLength + bigBufLen + cfg.Foot //计算数据包的长度
                 if (tempbuf.length() >= dataLength) {// tempBuf里不止一个数据包
                     bigBuf.appendBuffer(tempbuf.getBuffer(cfg.Head_Info + fileInfoLength, dataLength - cfg.Foot))//取得整个数据包
@@ -192,8 +217,21 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
         var savapath = config.getString(cfg.SAVE_PATH) + System.currentTimeMillis() + Math.random() + fileInfo.getString(cfg.FILE_NAME)
         log.debug("保存文件路径：$savapath, 文件来自：${socket.remoteAddress().host()}")
         socket.pause()
-        vertx.fileSystem().writeFileBlocking(savapath, this)
-        File(savapath).setLastModified(fileInfo.getLong(cfg.FILE_LAST_MODIFIED))//还原 拍摄时间
+        //--------test
+
+//         launch(UI){
+//            cc.addclient(Client(fileInfo.getString(cfg.FILE_NAME),fileInfo.getLong(cfg.FILE_SIZE).toString()))
+//         }
+        //--------end---test
+//        vertx.fileSystem().writeFileBlocking(savapath, this)
+        count=count+1
+//        println(count)
+        var file =  File(savapath)
+        file.setLastModified(fileInfo.getLong(cfg.FILE_LAST_MODIFIED))//还原 拍摄时间
+        log.info("${file.name} 保存成功${count} 文件位置${savapath}")
+//        Thumbnails.of(file).size(cfg.thumbW.toInt(),cfg.teumbH.toInt()).toFile(file.thumbName())
+        cc.addPicture(Picture(savapath))
+
         socket.resume()
     }
 
