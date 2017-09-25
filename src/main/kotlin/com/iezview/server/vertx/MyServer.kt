@@ -6,6 +6,7 @@ import com.iezview.server.util.utils
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.eventbus.Message
+import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.core.net.NetClient
@@ -58,14 +59,7 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
                         socketServer.close()
                         log.info("client [${socketServer.remoteAddress().host()}] 未注册，已终止连接")
                     }
-//                 var bs=   BufferStore(vertx, socketServer, socket, conf,cc)
-//                    bufferStoreMap.put(socketServer.remoteAddress().host(),bs)
-
-//                    socketServer.closeHandler {
-//                            log.info("aaa")
-////                        bufferStoreMap.remove(socketServer.remoteAddress().host())
-//                    }
-                }.listen(conf.getInteger(cfg.FILE_PORT), server.completer())
+                    }.listen(conf.getInteger(cfg.FILE_PORT), server.completer())
 
             }
         }.setHandler { server ->
@@ -89,10 +83,19 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
 //                       cfg.ReceiveAll-> enableReceiveAll()
 //                       cfg.DisableReceiveAll-> disableReceiveAll()
                         cfg.FreeSpace-> getFreeSpace(it)
+                        else -> println(it)
                    }
+        }
+
+        vertx.eventBus().consumer<JsonObject>("127.0.0.1"){
+            println(it.headers())
+            println(it.body())
+            it.reply(JsonObject().put("aaaa","bbb"))
+
         }
         vertx.eventBus().consumer<JsonObject>("com.iezview.publish"){
             println(it.body())
+
         }
 
     }
@@ -110,7 +113,9 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
     private fun tcpBridgeConf(): BridgeOptions {
         var bridgeOptions = BridgeOptions()
         bridgeOptions.inboundPermitteds = arrayListOf(
-                PermittedOptions().setAddress(cfg.ad_message) //[c]->[s] 消息发送
+                PermittedOptions().setAddress(cfg.ad_message) ,//[c]->[s] 消息发送
+                PermittedOptions().setAddress("127.0.0.1"),
+                PermittedOptions().setAddress("192.168.1.80")
         )
         bridgeOptions.outboundPermitteds = loadClients()
 
