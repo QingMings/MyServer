@@ -3,6 +3,7 @@ package com.iezview
 import com.iezview.server.app.cfg
 import com.iezview.server.controller.ClientController
 import com.iezview.server.model.Picture
+import com.iezview.server.util.MB
 import com.iezview.server.util.MyTask
 import com.iezview.server.util.thumbName
 import io.vertx.core.Vertx
@@ -36,14 +37,15 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
     private var fileInfo = JsonObject()
     private val log = LoggerFactory.getLogger(BufferStore::class.java)
     var enableReceive = false
+    var    timestart=0L //开始时间
     var count = 0
 
     init {
 //        println("获得连接${socket.remoteAddress().host()} , socketHash:${socket.hashCode()} ")
-        log.info("client:[${socket.remoteAddress().host()}] 获得连接")
+        log.info("client:[${socket.toString()}][${socket.remoteAddress().host()}] 获得连接")
         cc.remoteClientsProperty().value.filter { it.remoteAddress == socketServer.remoteAddress().host() }.forEach { it.onlineProperty().value = true }
         socketServer.closeHandler {
-            log.info("client:[${socketServer.remoteAddress().host()}] 断开连接")
+            log.info("client:[${socket.toString()}][${socketServer.remoteAddress().host()}] 断开连接")
             cc.remoteClientsProperty().value.filter { it.remoteAddress == socketServer.remoteAddress().host() }.forEach { it.onlineProperty().value = false }
         }
         socketHandler()
@@ -56,6 +58,7 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
                 return@handler
             }
             if (buffer.start()) {
+                timestart=System.currentTimeMillis()
                 states = -1
                 tempbuf.appendBuffer(buffer)
                 return@handler
@@ -85,6 +88,7 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
                         println("bufferAppend//////")
                         bigBufReset()//重置bigBuf
                         tempbuf = tempbuffer.getBuffer(dataLength, tempbuffer.length())//保存未处理的buffer部分
+                        timestart=System.currentTimeMillis()
                         moreone(tempbuf)
                     } else {
                         states = 1
@@ -137,10 +141,11 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
                         println("otherbif_Len:"+otherBuf.length())
                     }
                     otherBuf.start() -> {
+                        timestart=System.currentTimeMillis()
                         states = -1
                         tempbuf = Buffer.buffer()
-                        tempbuf.appendBuffer(otherBuf)
-//                        bufferAppend(otherBuf)
+//                        tempbuf.appendBuffer(otherBuf)
+                        bufferAppend(otherBuf)
                     }
                     else -> RECEIVE_ERROR()
                 }
@@ -169,6 +174,14 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
                 bigBuf.saveFileBlocking(fileInfo)
                 RECEIVE_SUCCESS()
                 log.info("文件保存成功, 文件名：${fileInfo.getString(cfg.FILE_NAME)}")
+                var  timenow=System.currentTimeMillis()
+                println(timestart)
+                println(timenow)
+                println("耗时${((timenow -timestart)/1000.0)}")
+                count += 1
+                println(count)
+
+                log.info("传输速度，${ bigBuf.length().toLong().MB()/((timenow -timestart)/1000.0) }  MB/s")
             } else {//
                 CRC32_ERROR()
                 log.info("校验失败，CRC32值不一样")

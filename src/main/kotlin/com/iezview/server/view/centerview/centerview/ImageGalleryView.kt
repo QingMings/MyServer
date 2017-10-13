@@ -1,9 +1,10 @@
-package com.iezview.server.view.centerview
+package com.iezview.server.view.centerview.centerview
 
 import com.iezview.server.controller.ClientController
 import com.iezview.server.model.Picture
 import com.iezview.server.util.toURL
 import javafx.geometry.Insets
+import javafx.geometry.Point2D
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.layout.Background
@@ -18,8 +19,8 @@ import tornadofx.*
  */
 class ImageGalleryView : View("My View") {
     val cc: ClientController by inject()
-    override val root =
-            scrollpane {
+    override val root =borderpane {
+        center  =  scrollpane {
                 stackpane {
                     flowpane {
                         bindComponents(cc.pictures) { ImageBoxFragment(it) }
@@ -29,6 +30,15 @@ class ImageGalleryView : View("My View") {
                 isFitToWidth = true
                 isFitToHeight
             }
+
+         bottom {
+             hbox {
+                 label("接收照片数量：")
+                 label { textProperty().bind(cc.pictures.sizeProperty.asString()) }
+                 label("  张")
+             }
+         }
+    }
 }
 
 class ImageBoxStyle : Stylesheet() {
@@ -51,7 +61,7 @@ class ImageBoxStyle : Stylesheet() {
 }
 
 /**
- * ImageBox
+ * ImageBox  单个图片容器
  */
 class ImageBoxFragment(picture: Picture) : Fragment() {
     init {
@@ -74,13 +84,20 @@ class ImageBoxFragment(picture: Picture) : Fragment() {
             label(picture.name) {
                 addClass(ImageBoxStyle.imagelabel)
                 paddingAll = 5
-                textFill=c("#b3b3b3")
+                textFill = c("#b3b3b3")
                 stackpaneConstraints { alignment = Pos.BOTTOM_LEFT }
                 imagev.onHover { hovering ->
                     /**
                      * padding  宽度动画
                      */
                     paddingVerticalProperty.animate(if (hovering) 20 else 10, 200.millis)
+//                    imagev.viewportProperty().animate(
+//                            if (hovering)
+//                                Rectangle2D(10.0, 10.0, imagev.image.width, imagev.image.height)
+//                            else
+//                                Rectangle2D(0.0, 0.0, imagev.image.width, imagev.image.height), 2000.millis)
+
+
 //                                    translateYProperty().animate(if (hovering) 0 else 39, 200.millis)
                     /**
                      * 背景透明度动画
@@ -91,7 +108,7 @@ class ImageBoxFragment(picture: Picture) : Fragment() {
                             else
                                 Background(BackgroundFill(c("#ff0000", 0.0), CornerRadii.EMPTY, Insets.EMPTY))
                             , 100.millis)
-                    textFillProperty().animate(if (hovering) c("#e4e3e3") else c("#b3b3b3"),200.millis)
+                    textFillProperty().animate(if (hovering) c("#e4e3e3") else c("#b3b3b3"), 200.millis)
                 }
             }
         }
@@ -101,3 +118,5 @@ class ImageBoxFragment(picture: Picture) : Fragment() {
         prefHeight = 152.0;prefWidth = 204.0; maxHeight = 152.0;minHeight = 152.0
     }
 }
+
+fun  Image.center()=Point2D(this.width/2,this.height/2)

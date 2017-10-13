@@ -1,8 +1,14 @@
 package com.iezview.server.app
 
+/**
+ * 程序配置类
+ */
 object cfg {
 
-
+    /**
+     * 开始发送文件[C->S]
+     *
+     * */
     val START_SEND_FILE = "7e7eStart7e7e"//开始发送文件[C->S]
     val END_SEND_FILE = "7e7eEnd7e7e"//结束发送文件[C->S]
     val CHECK_SERVER_ONLINE_TIME = 5000L //检测TcpServer 就绪 的时间间隔[C]

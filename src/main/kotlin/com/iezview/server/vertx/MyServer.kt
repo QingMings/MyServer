@@ -83,20 +83,20 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
 //                       cfg.ReceiveAll-> enableReceiveAll()
 //                       cfg.DisableReceiveAll-> disableReceiveAll()
                         cfg.FreeSpace-> getFreeSpace(it)
-                        else -> println(it)
+                        else -> println("Unkown message :$it")
                    }
         }
 
-        vertx.eventBus().consumer<JsonObject>("127.0.0.1"){
-            println(it.headers())
-            println(it.body())
-            it.reply(JsonObject().put("aaaa","bbb"))
-
-        }
-        vertx.eventBus().consumer<JsonObject>("com.iezview.publish"){
-            println(it.body())
-
-        }
+//        vertx.eventBus().consumer<JsonObject>("127.0.0.1"){
+//            println(it.headers())
+//            println(it.body())
+//            it.reply(JsonObject().put("aaaa","bbb"))
+//
+//        }
+//        vertx.eventBus().consumer<JsonObject>("com.iezview.publish"){
+//            println(it.body())
+//
+//        }
 
     }
 

@@ -1,0 +1,17 @@
+tab {
+   -fx-background-color: white;
+}
+
+.tab:hover, .tab:selected {
+   -fx-background-color: black;
+}
+
+.tab-label {
+   background: white;
+   -fx-text-fill: ladder(background, white 49%, green  10%);
+}
+
+.tab-label:hover, .tab:selected > .tab-container > .tab-label {
+   background: black;
+   -fx-text-fill: ladder(background, white 49%, green 10%);
+}

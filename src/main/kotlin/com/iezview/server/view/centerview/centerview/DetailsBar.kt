@@ -1,8 +1,6 @@
-package com.iezview.server.view.centerview
+package com.iezview.server.view.centerview.centerview
 
 import com.iezview.server.controls.toolbarbutton.segmentedbutton
-import com.iezview.server.controls.toolbarbutton.toolbarbutton
-import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Priority
@@ -12,8 +10,9 @@ class DetailsBar : View("My View") {
     init {
         importStylesheet(DetailsBarStyle::class)
     }
-    val imageGallery:ImageGalleryView by inject()
-    val DetailsList:DetailsListView by inject()
+    val imageGallery: ImageGalleryView by inject()
+    val DetailsList: DetailsListView by inject()
+    val cameraExposure: CameraexposureView by inject()
     override val root = hbox {
         toolbar {
             addClass(DetailsBarStyle.detailsBar)
@@ -22,6 +21,7 @@ class DetailsBar : View("My View") {
                 apply {
                     this.buttons.addAll(
                             togglebutton {
+                                tooltip("预览视图")
                                 addClass(DetailsBarStyle.tooglebtn)
                                 graphic = imageview(Image("icons/listdetails.png")) { fitHeight = 12.0;fitWidth = 12.0 }
                                 action {
@@ -30,9 +30,17 @@ class DetailsBar : View("My View") {
                             }
                             ,
                             togglebutton {
+                                tooltip("表格视图")
                                 addClass(DetailsBarStyle.tooglebtn)
                                 graphic = imageview(Image("icons/list.png")) { fitHeight = 12.0;fitWidth = 12.0 }
                                 action { (this@hbox.parent as BorderPane).center?.replaceChildren(DetailsList.root) }
+                            }
+                            ,
+                            togglebutton {
+                                tooltip("曝光列表")
+                                addClass(DetailsBarStyle.tooglebtn)
+                                graphic = imageview(Image("icons/list.png")) { fitHeight = 12.0;fitWidth = 12.0 }
+                                action{ (this@hbox.parent as BorderPane).center?.replaceChildren(cameraExposure.root) }
                             }
                     )
                 }

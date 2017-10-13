@@ -10,14 +10,20 @@ import javafx.stage.Stage
 import javafx.stage.StageStyle
 import tornadofx.*
 
+/**
+ *  程序入口类
+ */
 class MyApp: App(MainView::class, Styles::class){
     override fun stop() {
             fire(closeApplication())
     }
     init {
+        /**
+         * 设置全局异常处理
+         */
         Thread.setDefaultUncaughtExceptionHandler(DefaultErrorHandler())
     }
-
+    
     override fun start(stage: Stage) {
 //        设置无窗体且背景透明
 //        stage.initStyle(StageStyle.TRANSPARENT)

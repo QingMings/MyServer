@@ -9,20 +9,38 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
+
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <properties>
-        <kotlin.version>1.1.50</kotlin.version>
-        <tornadofx.version>1.7.10</tornadofx.version>
+        <kotlin.version>1.1.51</kotlin.version>
+        <tornadofx.version>1.7.12-SNAPSHOT</tornadofx.version>
+        <!--<tornadofx.version>1.7.11</tornadofx.version>-->
         <junit.version>4.12</junit.version>
         <vertx.version>3.4.2</vertx.version>
+        <dokka.version>0.9.15</dokka.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental><!-- 启动增量编译功能-->
         <main.class>com.iezview.server.app.MyAppKt</main.class>
 
     </properties>
     <repositories>
         <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+        <repository>
             <id>central</id>
             <url>http://jcenter.bintray.com</url>
         </repository>
+
     </repositories>
 
     <dependencies>
@@ -186,6 +204,20 @@
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka.version}</version>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>dokka</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

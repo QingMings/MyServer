@@ -1,10 +1,9 @@
-package com.iezview.server.view.centerview
+package com.iezview.server.view.centerview.centerview
 
 import com.iezview.server.controller.ClientController
 import com.iezview.server.view.centerview.driverview.CameraSettingFragment
 import com.iezview.server.view.centerview.driverview.ClientContentFragment
 import javafx.geometry.Side
-import javafx.scene.control.SplitPane
 import tornadofx.*
 
 class CenterView : View("My View") {
@@ -41,15 +40,11 @@ class CenterView : View("My View") {
             top = detiailsBar.root
             center {
                 stackpane {
-                    add(DetailsListView::class)
+                    add(CameraexposureView::class)
                 }
             }
             bottom {
-                hbox {
-                    label("接收照片数量：")
-                    label { textProperty().bind(cc.pictures.sizeProperty.asString()) }
-                    label("  张")
-                }
+
             }
         }
     }

@@ -2,7 +2,7 @@ import tornadofx.*
 
 class TestListView : View("My View") {
 
-    val test = arrayListOf<String>("aaaaa", "bbbb", "cccc", "ddd").observable()
+    val test = arrayListOf<String>("aaaaa3333333333333333333333333333333333333333", "bbbb", "cccc", "ddd").observable()
     override val root = vbox {
         hbox {
             button("removeAll and add") {
@@ -17,8 +17,22 @@ class TestListView : View("My View") {
         }
 
         listview(test) {
-            isFillWidth
+            style{
 
+
+            }
         }
+    }
+}
+
+class  listHbarStyle : Stylesheet(){
+       companion object {
+           val   listview by cssclass()
+       }
+
+    init {
+         listview{
+             scrollBar
+         }
     }
 }

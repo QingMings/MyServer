@@ -1,6 +1,8 @@
 package com.mysoft.testp;
 
 
+import javafx.animation.Interpolator;
+import javafx.animation.PathTransition;
 import javafx.application.Application;
 
 import static javafx.application.Application.launch;

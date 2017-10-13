@@ -1,12 +1,9 @@
 package com.iezview.server.view
 
 import com.iezview.server.controller.ClientController
-import com.iezview.server.view.centerview.CenterView
+import com.iezview.server.view.centerview.centerview.CenterView
 import com.iezview.server.view.statusbar.StatusBarView
-import javafx.concurrent.Task
-import javafx.event.EventTarget
 import javafx.scene.paint.Color
-import org.controlsfx.control.TaskProgressView
 import tornadofx.*
 
 class MainView : View("TcpServer接收端程序") {

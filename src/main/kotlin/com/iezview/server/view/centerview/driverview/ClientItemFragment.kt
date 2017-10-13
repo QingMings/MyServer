@@ -5,6 +5,7 @@ import com.iezview.util.Gradient
 import javafx.beans.binding.Bindings
 import javafx.geometry.Pos
 import javafx.scene.effect.DropShadow
+import javafx.scene.effect.Glow
 import javafx.scene.paint.Color
 import tornadofx.*
 
@@ -22,6 +23,7 @@ class ClientItemFragment(it: RemoteClient) : Fragment("Client") {
                     radius = 8.0
                     fillProperty().bind(Bindings.`when`(it.onlineProperty().toBinding()).then(Gradient.ON_LINE).otherwise(Gradient.ERROR_CONN))
                     effect = DropShadow(8.0, Color.color(0.4, 0.4, 0.4))
+                    effect = Glow(0.7)
                 }
                 alignment=Pos.CENTER
             }

@@ -58,8 +58,8 @@ class ButtonStyle : Stylesheet() {
             backgroundRadius = multi(box(3.px, 0.px, 0.px, 3.px), box(2.px, 0.px, 0.px, 2.px), box(2.px, 0.px, 0.px, 2.px))
         }
         segmentbtn and lastbtn {
-            backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
-            backgroundRadius = multi(box(0.px, 3.px, 3.px, 0.px), box(0.px, 2.px, 2.px, 0.px), box(0.px, 2.px, 2.px, 0.px))
+                backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
+                backgroundRadius = multi(box(0.px, 3.px, 3.px, 0.px), box(0.px, 2.px, 2.px, 0.px), box(0.px, 2.px, 2.px, 0.px))
         }
     }
 }
