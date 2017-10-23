@@ -23,7 +23,7 @@ class ClientItemFragment(it: RemoteClient) : Fragment("Client") {
                     radius = 8.0
                     fillProperty().bind(Bindings.`when`(it.onlineProperty().toBinding()).then(Gradient.ON_LINE).otherwise(Gradient.ERROR_CONN))
                     effect = DropShadow(8.0, Color.color(0.4, 0.4, 0.4))
-                    effect = Glow(0.7)
+//                    effect = Glow(0.7)
                 }
                 alignment=Pos.CENTER
             }

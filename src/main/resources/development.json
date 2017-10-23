@@ -22,7 +22,8 @@
       "exposureTime":30.0,
       "exposureTimeAuto":false,
       "brightness":70.0,
-      "brightnessAuto":false
+      "brightnessAuto":false,
+      "triggerMode":1
     }
 
   }

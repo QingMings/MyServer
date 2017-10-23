@@ -3,10 +3,14 @@ package com.iezview.server.view.centerview.driverview
 import com.iezview.server.app.cfg
 import com.iezview.server.controller.ClientController
 import com.iezview.server.controls.slider.myslider
+import com.iezview.server.controls.toolbarbutton.toggleswitch
 import com.iezview.server.controls.toolbarbutton.viewbutton
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
+import javafx.beans.binding.Bindings
+import javafx.beans.binding.BooleanBinding
 import javafx.geometry.Pos
+import javafx.scene.control.ToggleGroup
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -15,6 +19,7 @@ import tornadofx.*
  */
 class CameraSettingFragment : Fragment("相机设置") {
     val cc: ClientController by inject()
+
     init {
         importStylesheet(CameraSettingFragmentStyle::class)
     }
@@ -45,7 +50,8 @@ class CameraSettingFragment : Fragment("相机设置") {
                             }
                         }
                         field("曝光时间") {
-                            myslider(0, 100) {
+                            myslider(0, 65535) {
+
                                 valueProperty().bindBidirectional(cc.cameraSettingModel.exposureTime)
                                 autovalueProperty().bindBidirectional(cc.cameraSettingModel.exposureTimeAuto)
                             }
@@ -54,6 +60,18 @@ class CameraSettingFragment : Fragment("相机设置") {
                             myslider(0, 100) {
                                 valueProperty().bindBidirectional(cc.cameraSettingModel.brightness)
                                 autovalueProperty().bindBidirectional(cc.cameraSettingModel.brightnessAuto)
+                            }
+                        }
+
+                        field("触发模式") {
+                            val togglegroup = ToggleGroup()
+                            radiobutton("软触发", togglegroup, 2)
+                            radiobutton("硬触发", togglegroup, 1)
+                            togglegroup.selectedValueProperty<Int>().bindBidirectional(cc.cameraSettingModel.triggerMode)
+                        }
+                        field("测试") {
+                            label {
+                                textProperty().bind(cc.cameraSettingModel.item.triggerModeProperty().asString())
                             }
                         }
                         buttonbar("", forceLabelIndent = true) {
@@ -66,15 +84,13 @@ class CameraSettingFragment : Fragment("相机设置") {
                             }
                             button("保存") {
                                 addClass(CameraSettingFragmentStyle.smallbtn)
-                                enableWhen{cc.vertxRunningProperty()}
+                                enableWhen { cc.vertxRunningProperty() }
                                 requestFocus()
                                 action {
-                                    cc.cameraSettingModel.commit{
-                                        cc.updateConfig(cfg.Update_CameraSettings,Pair(cfg.CameraSetting,JsonObject(cc.cameraSettingModel.item.toJSON().toString())))
+                                    cc.cameraSettingModel.commit {
+                                        cc.updateConfig(cfg.Update_CameraSettings, Pair(cfg.CameraSetting, JsonObject(cc.cameraSettingModel.item.toJSON().toString())))
                                     }
-                                    println(cc.cameraSettingModel.item)
                                 }
-
                             }
                         }
                     }
@@ -82,7 +98,7 @@ class CameraSettingFragment : Fragment("相机设置") {
             }
         }
 
-        prefWidth=350.0
+        prefWidth = 350.0
     }
 }
 
@@ -97,7 +113,7 @@ class CameraSettingFragmentStyle : Stylesheet() {
                 alignment = Pos.TOP_RIGHT
             }
         }
-        smallbtn{
+        smallbtn {
             fontSize = 12.px
             padding = box(4.px)
             minWidth = 56.px

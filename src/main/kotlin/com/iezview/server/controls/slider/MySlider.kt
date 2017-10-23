@@ -18,14 +18,18 @@ class MySlider(startValue: Int, endValue: Int) : HBox() {
     val endValue = endValue
     var autovalue by property(false)
     fun autovalueProperty()=getProperty(MySlider::autovalue)
-
+//    var majorTickUnit  by property(25.0)
+//    fun majorTickUnitProperty() =getProperty(MySlider::majorTickUnit)
     init {
         importStylesheet(MySliderStyle::class)
         this.addClass(MySliderStyle.myhbox)
         val slider = slider(this.startValue.toDouble(), this.endValue.toDouble()) {
+//            majorTickUnitProperty().bind(this.majorTickUnitProperty())
+            majorTickUnit=(max/4).toInt().toDouble()
             valueProperty().bindBidirectional(this@MySlider.valueProperty() as Property<Number>)
             isShowTickMarks = true;isShowTickLabels = true
             hgrow=Priority.ALWAYS
+
         }
         label {
             textProperty().bind(stringBinding(slider.valueProperty()){ value.toInt().toString()})
@@ -48,7 +52,7 @@ class MySliderStyle : Stylesheet() {
         myhbox {
             alignment = Pos.TOP_CENTER
             label {
-                minWidth = 25.px
+                minWidth = 45.px
             }
             checkBox{
                 box{

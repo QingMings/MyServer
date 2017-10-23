@@ -1,6 +1,9 @@
 package com.iezview.server.controls.toolbarbutton
 
+import com.iezview.server.controls.slider.MySlider
+import com.iezview.server.controls.slider.myslider
 import javafx.beans.binding.Bindings
+import javafx.event.EventTarget
 import javafx.scene.control.Button
 import javafx.scene.control.ToggleButton
 import javafx.scene.control.ToolBar
@@ -10,6 +13,7 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod
 import javafx.scene.paint.RadialGradient
 import javafx.scene.paint.Stop
+import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 
 /**
@@ -204,4 +208,17 @@ fun ToolBar.segmentedbutton(op:(org.controlsfx.control.SegmentedButton.()->Unit)
     return button
 }
 
+fun  EventTarget.toggleswitch(text: String,op:(ToggleSwitch.()->Unit)):ToggleSwitch=opcr(this, ToggleSwitch(text), op)
+//{
+//    var  toggleSwitch =ToggleSwitch(text)
+//     op.invoke(toggleSwitch)
+//    return toggleSwitch
+//}
+
+fun  ToolBar.toggleswitch(text: String,op:(ToggleSwitch.()->Unit)):ToggleSwitch{
+    var  toggleSwitch =ToggleSwitch(text)
+    items.add(toggleSwitch)
+    op.invoke(toggleSwitch)
+    return toggleSwitch
+}
 

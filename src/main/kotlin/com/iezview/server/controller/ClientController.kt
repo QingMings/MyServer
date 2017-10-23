@@ -44,8 +44,8 @@ class ClientController : Controller() {
      * vertx 部署状态
      */
     var vertxRunning by property(false)
-
     fun vertxRunningProperty() = getProperty(ClientController::vertxRunning)
+
     lateinit var socketclient: NetSocket
     /**
      * 磁盘空间查询Controller
@@ -77,7 +77,8 @@ class ClientController : Controller() {
 
         retriever.listen { change ->
             println("change")
-            logg.info(change.newConfiguration.toString())
+            logg.info(" reload config ${change.newConfiguration}")
+//            updateCameraSetting(change.newConfiguration)
 
         }
 
@@ -214,9 +215,13 @@ class ClientController : Controller() {
      * 从配置文件初始化相机设置model
      */
     private fun initCameraSetting(config: JsonObject) {
-        cameraSettingModel.asyncItem { loadJsonModel(config.getJsonObject(cfg.ROOT).getJsonObject(cfg.CameraSetting).encode()) }
+//        cameraSettingModel.asyncItem { loadJsonModel(config.getJsonObject(cfg.ROOT).getJsonObject(cfg.CameraSetting).encode()) }
+        cameraSettingModel.item.updateModel(loadJsonObject(config.getJsonObject(cfg.ROOT).getJsonObject(cfg.CameraSetting).encode()))
     }
 
+    /**
+     *  下发相机配置到客户端，并保存文件
+     */
     fun updateConfig(message: String, params: Pair<String, JsonObject>) {
         pushMessageWithParams(message, params)
         var currentConfig = deployOptions.config.copy()

@@ -32,6 +32,14 @@ class CameraSetting : JsonModel {
     fun brightnessProperty() = getProperty(CameraSetting::brightness)
     var brightnessAuto by property(false)
     fun brightnessAutoProperty() = getProperty(CameraSetting::brightnessAuto)
+    /**
+     * 触发模式
+     * 1 硬触发
+     * 2 软触发
+     * default  1
+     */
+    var triggerMode by property(1)
+    fun triggerModeProperty() =getProperty(CameraSetting::triggerMode)
 
     override fun updateModel(json: JsonObject) {
         with(json) {
@@ -41,6 +49,7 @@ class CameraSetting : JsonModel {
             exposureTimeAuto = bool("exposureTimeAuto")
             brightness = int("brightness")
             brightnessAuto = bool("brightnessAuto")
+            triggerMode=int("triggerMode")
 
         }
     }
@@ -53,23 +62,25 @@ class CameraSetting : JsonModel {
             add("exposureTimeAuto",exposureTimeAuto)
             add("brightness", brightness)
             add("brightnessAuto",brightnessAuto)
+            add("triggerMode",triggerMode)
         }
     }
 
     override fun toString(): String {
-        return "CameraSetting(whiteBalance=$whiteBalance,whiteBalanceAuto=$whiteBalanceAuto,exposureTime=$exposureTime,exposureTimeAuto=$exposureTimeAuto,brightness=$brightness,brightnessAuto=$brightnessAuto)"
+        return "CameraSetting(whiteBalance=$whiteBalance,whiteBalanceAuto=$whiteBalanceAuto,exposureTime=$exposureTime,exposureTimeAuto=$exposureTimeAuto,brightness=$brightness,brightnessAuto=$brightnessAuto,triggerMode=${triggerMode})"
     }
 
 
 }
 
-class CameraSettingModel : ItemViewModel<CameraSetting>() {
+class CameraSettingModel : ItemViewModel<CameraSetting>(CameraSetting()) {
     val whiteBalance = bind(CameraSetting::whiteBalanceProperty, false)
     val whiteBalanceAuto = bind(CameraSetting::whiteBalanceAutoProperty, false)
     val exposureTime = bind(CameraSetting::exposureTimeProperty, false)
     val exposureTimeAuto = bind(CameraSetting::exposureTimeAutoProperty, false)
     val brightness = bind(CameraSetting::brightnessProperty, false)
     val brightnessAuto = bind(CameraSetting::brightnessAutoProperty, false)
+    val triggerMode =bind(CameraSetting::triggerModeProperty,false)
 }
 
 
