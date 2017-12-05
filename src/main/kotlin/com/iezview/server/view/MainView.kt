@@ -17,6 +17,7 @@ class MainView : View("TcpServer接收端程序") {
     }
 
     override val root = borderpane {
+
         addClass(MainViewStyle.mainView)
         top = topView.root
         center =centerView.root
@@ -24,6 +25,8 @@ class MainView : View("TcpServer接收端程序") {
     }
 
     override fun onDock() {
+        this.root.opacity=0.1
+        this.fade(5.seconds,1)
     }
 
     override fun onUndock() {

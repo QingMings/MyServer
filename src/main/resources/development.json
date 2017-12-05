@@ -12,13 +12,13 @@
       "192.168.1.225",
       "192.168.1.230",
       "192.168.1.235",
-      "192.168.1.52",
+      "192.168.1.162",
       "127.0.0.1",
-      "192.168.1.80"
+      "192.168.1.32"
     ],
     "CameraSetting":{
       "whiteBalance":20.0,
-      "whiteBalanceAuto":false,
+      "whiteBalanceAuto":true,
       "exposureTime":30.0,
       "exposureTimeAuto":false,
       "brightness":70.0,

@@ -13,6 +13,7 @@ class DetailsBar : View("My View") {
     val imageGallery: ImageGalleryView by inject()
     val DetailsList: DetailsListView by inject()
     val cameraExposure: CameraexposureView by inject()
+    val fileCodeList:FileCodeList by inject()
     override val root = hbox {
         toolbar {
             addClass(DetailsBarStyle.detailsBar)
@@ -40,7 +41,7 @@ class DetailsBar : View("My View") {
                                 tooltip("曝光列表")
                                 addClass(DetailsBarStyle.tooglebtn)
                                 graphic = imageview(Image("icons/list.png")) { fitHeight = 12.0;fitWidth = 12.0 }
-                                action{ (this@hbox.parent as BorderPane).center?.replaceChildren(cameraExposure.root) }
+                                action{ (this@hbox.parent as BorderPane).center?.replaceChildren(fileCodeList.root) }
                             }
                     )
                 }

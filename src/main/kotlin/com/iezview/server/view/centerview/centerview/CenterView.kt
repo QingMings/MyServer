@@ -40,7 +40,8 @@ class CenterView : View("My View") {
             top = detiailsBar.root
             center {
                 stackpane {
-                    add(CameraexposureView::class)
+//                    add(CameraexposureView::class)
+                    add(FileCodeList::class)
                 }
             }
             bottom {

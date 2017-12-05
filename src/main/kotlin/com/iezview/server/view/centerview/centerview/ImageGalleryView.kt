@@ -3,6 +3,7 @@ package com.iezview.server.view.centerview.centerview
 import com.iezview.server.controller.ClientController
 import com.iezview.server.model.Picture
 import com.iezview.server.util.toURL
+import com.iezview.server.util.toURLStr
 import javafx.geometry.Insets
 import javafx.geometry.Point2D
 import javafx.geometry.Pos
@@ -74,7 +75,7 @@ class ImageBoxFragment(picture: Picture) : Fragment() {
             var imagev = imageview {
                 addClass(ImageBoxStyle.imagecontainer)
                 runAsyncWithProgress {
-                    Image(picture.thumbpath.toURL())
+                    Image(picture.thumbpath.toURLStr())
                 }.ui {
                     image = it
                 }

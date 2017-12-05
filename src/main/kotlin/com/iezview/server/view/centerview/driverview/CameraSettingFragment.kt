@@ -69,11 +69,11 @@ class CameraSettingFragment : Fragment("相机设置") {
                             radiobutton("硬触发", togglegroup, 1)
                             togglegroup.selectedValueProperty<Int>().bindBidirectional(cc.cameraSettingModel.triggerMode)
                         }
-                        field("测试") {
-                            label {
-                                textProperty().bind(cc.cameraSettingModel.item.triggerModeProperty().asString())
-                            }
-                        }
+//                        field("测试") {
+//                            label {
+//                                textProperty().bind(cc.cameraSettingModel.item.triggerModeProperty().asString())
+//                            }
+//                        }
                         buttonbar("", forceLabelIndent = true) {
                             button("还原") {
                                 addClass(CameraSettingFragmentStyle.smallbtn)

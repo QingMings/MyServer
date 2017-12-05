@@ -1,6 +1,7 @@
 
 
 
+import io.vertx.ext.unit.junit.RunTestOnContext;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -62,9 +63,11 @@ public class TaskProgressTests extends Application {
                     throws InterruptedException {
                 try {
                     Thread.sleep(ThreadLocalRandom.current().nextInt(200, 2000));
+
                 } catch (InterruptedException e) {
                     //e.printStackTrace();
                 }
+
                 updateMessage("Finding friends . . .");
                 updateProgress(0, 100);
                 for (int i = 0; i < 100; i++) {
@@ -75,9 +78,11 @@ public class TaskProgressTests extends Application {
 
                     updateProgress(i + 1, 100);
                     updateMessage("Found " + (i + 1) + " friends!");
-
+                    updateTitle("Found QQQ" + (i + 1) + " friends!");
                     try {
                         Thread.sleep(300);
+//                        throw new RuntimeException("测试失败");
+
                     } catch (InterruptedException interrupted) {
                         if (isCancelled()) {
                             updateMessage("Cancelled");
@@ -88,6 +93,16 @@ public class TaskProgressTests extends Application {
                 updateMessage("Found all.");
                 done();
                 return null;
+            }
+
+            @Override
+            protected void cancelled() {
+                System.out.println("取消了");
+            }
+
+            @Override
+            protected void failed() {
+                System.out.println("失败了");
             }
         };
     }

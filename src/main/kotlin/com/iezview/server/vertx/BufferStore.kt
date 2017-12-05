@@ -5,6 +5,7 @@ import com.iezview.server.controller.ClientController
 import com.iezview.server.model.Picture
 import com.iezview.server.util.MB
 import com.iezview.server.util.MyTask
+import com.iezview.server.util.createDirectories
 import com.iezview.server.util.thumbName
 import io.vertx.core.Vertx
 import io.vertx.core.buffer.Buffer
@@ -15,6 +16,7 @@ import io.vertx.ext.eventbus.bridge.tcp.impl.protocol.FrameHelper
 import net.coobird.thumbnailator.Thumbnails
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.nio.file.Paths
 import java.util.zip.CRC32
 import java.util.zip.CheckedInputStream
 import kotlinx.coroutines.experimental.javafx.JavaFx as UI
@@ -226,15 +228,17 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
      * 保存文件
      */
     private fun Buffer.saveFileBlocking(fileInfo: JsonObject) {
-        var savapath = config.getString(cfg.SAVE_PATH) + System.currentTimeMillis() + Math.random() + fileInfo.getString(cfg.FILE_NAME)
-        log.debug("保存文件路径：$savapath, 文件来自：${socket.remoteAddress().host()}")
+        var savepath=Paths.get(config.getString(cfg.SAVE_PATH)).resolve(fileInfo.getString(cfg.FILE_CODE))
+        createDirectories(savepath)
+        savepath= savepath.resolve(fileInfo.getString(cfg.FILE_NAME))
+        log.debug("保存文件路径：$savepath, 文件来自：${socket.remoteAddress().host()}")
         socket.pause()
-        vertx.fileSystem().writeFileBlocking(savapath, this)
-        var file = File(savapath)
+        vertx.fileSystem().writeFileBlocking(savepath.toString(), this)
+        var file = File(savepath.toString())
         file.setLastModified(fileInfo.getLong(cfg.FILE_LAST_MODIFIED))//还原 拍摄时间
-        log.debug("${file.name} 保存成功${count} 文件位置${savapath}")
+        log.debug("${file.name} 保存成功${count} 文件位置${savepath}")
         Thumbnails.of(file).size(cfg.thumbW.toInt(), cfg.teumbH.toInt()).toFile(file.thumbName())
-        cc.addPicture(Picture(savapath))
+        cc.addPicture(Picture(savepath.toString()))
         socket.resume()
     }
 
@@ -274,6 +278,8 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
      * 数据包的最后一个buffer的文件内容
      */
     private fun Buffer.end() = this.getBuffer(0, this.length() - 11)
+
+
 }
 
 

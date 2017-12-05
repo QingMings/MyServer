@@ -15,8 +15,8 @@ class Gradient {
         val ON_LINE = RadialGradient(
                 0.0,
                 0.1,
-                100.0,
-                100.0,
+                80.0,
+                80.0,
                 20.0,
                 false,
                 CycleMethod.NO_CYCLE,
@@ -26,8 +26,8 @@ class Gradient {
         val OFF_LINE =RadialGradient(
                 0.0,
                 0.1,
-                100.0,
-                100.0,
+                80.0,
+                80.0,
                 20.0,
                 false,
                 CycleMethod.NO_CYCLE,
@@ -37,8 +37,8 @@ class Gradient {
         val ERROR_CONN =RadialGradient(
                 0.0,
                 0.1,
-                100.0,
-                100.0,
+                80.0,
+                80.0,
                 20.0,
                 false,
                 CycleMethod.NO_CYCLE,

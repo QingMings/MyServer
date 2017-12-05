@@ -14,6 +14,11 @@ class Styles : Stylesheet() {
     }
 
     init {
+        root{
+            //            fontFamily="FangSong"
+//            fontFamily= "Hei"
+//            fontFamily= "Sun"
+        }
         label and heading {
             padding = box(10.px)
             fontSize = 20.px
@@ -29,6 +34,10 @@ class Styles : Stylesheet() {
 
             }
         }
+
+
+
+
 
     }
 }

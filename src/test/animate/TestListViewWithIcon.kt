@@ -1,6 +1,7 @@
 package animate
 
 import com.iezview.server.util.toURL
+import com.iezview.server.util.toURLStr
 import javafx.scene.Cursor
 import javafx.scene.Parent
 import javafx.scene.image.Image
@@ -27,7 +28,7 @@ class  ListViewIconitem(it :String):Fragment(){
     override val root=hbox {
         label {
             graphic=pane{
-            imageview(Image("/Users/shishifanbuxie/IdeaProjects/MyServer/src/main/resources/icons/list.png".toURL())){
+            imageview(Image("/Users/shishifanbuxie/IdeaProjects/MyServer/src/main/resources/icons/list.png".toURLStr())){
                 fitWidth = 16.0;fitHeight = 16.0
             }
 

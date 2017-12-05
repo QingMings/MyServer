@@ -41,7 +41,7 @@ class MySlider(startValue: Int, endValue: Int) : HBox() {
 
 }
 
-fun EventTarget.myslider(startValue: Int, endValue: Int, op: (MySlider.() -> Unit)?) = opcr(this, MySlider(startValue, endValue), op)
+fun EventTarget.myslider(startValue: Int, endValue: Int, op: (MySlider.() -> Unit)) = opcr(this, MySlider(startValue, endValue), op)
 
 
 class MySliderStyle : Stylesheet() {
