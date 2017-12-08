@@ -31,6 +31,12 @@ class RemoteClient( remoteAddress:String):ViewModel(){
     var triggerMode by property("")
     fun triggerModeProperty() =getProperty(RemoteClient::triggerMode)
     /**
+     * 触发模式str
+     * 由客户端返回
+     */
+    var triggerModeStr by property("")
+    fun triggerModeStrProperty() =getProperty(RemoteClient::triggerModeStr)
+    /**
      * 随机值
      */
     var r by property("")

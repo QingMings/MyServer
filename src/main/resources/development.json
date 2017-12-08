@@ -3,7 +3,7 @@
     "filePort": 9999,
     "messagePort": 9000,
     "savePath": "/Users/shishifanbuxie/IdeaProjects/MyServer/receivefiles/",
-    //    "savePath": "C://test/",
+//        "savePath": "C:/",
     "clients": [
       "192.168.1.205",
       "192.168.1.53",
@@ -24,7 +24,8 @@
       "brightness":70.0,
       "brightnessAuto":false,
       "triggerMode":1
-    }
+    },
+    "CameraNum":70
 
   }
 }

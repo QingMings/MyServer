@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 /**
  * 详细列表
  */
-class DetailsListView : View("My View") {
+class DetailsListView : View("详细列表") {
     val cc: ClientController by inject()
     override val root = borderpane {
         center = tableview(cc.picturesProperty()) {

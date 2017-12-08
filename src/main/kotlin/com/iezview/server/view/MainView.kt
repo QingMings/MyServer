@@ -8,16 +8,14 @@ import tornadofx.*
 
 class MainView : View("TcpServer接收端程序") {
     val cc: ClientController by inject()
-    val serverModel: ServerModel by inject()
-    val topView: ToolBarView by inject()
-    val centerView: CenterView by inject()
-    val  bottomView: StatusBarView by inject()
+    private val topView: ToolBarView by inject()
+    private val centerView: CenterView by inject()
+    private val  bottomView: StatusBarView by inject()
     init {
         importStylesheet(MainViewStyle::class)
     }
 
     override val root = borderpane {
-
         addClass(MainViewStyle.mainView)
         top = topView.root
         center =centerView.root
@@ -57,21 +55,6 @@ class MainViewStyle : Stylesheet() {
     }
 }
 
-class Server(state: String) : JsonModel {
-    constructor() : this("")
 
-    var serverStates: String by property(state)
-    fun serverStatesProperty() = getProperty(Server::serverStates)
-    var savePath by property<String>("")
-    fun savePathProperty() = getProperty(Server::savePath)
-
-}
-
-
-
-class ServerModel : ItemViewModel<Server>(Server()) {
-    val serverStates = bind(Server::serverStatesProperty)
-    val savePath = bind(Server::savePathProperty)
-}
 
 

@@ -34,6 +34,7 @@ object cfg {
     val message = "message"
     val messageType = "messageType"
     val messageState = "messageState"
+    val cameraMode ="cameraMode"
     val fileCode = "file_code"
 
     val result = "result"
@@ -47,7 +48,7 @@ object cfg {
     val Fetch_Client="fetch_client"//取照片到开发板
     val Fetch_Server="fetch_server"//取照片到Server
     val Update_CameraSettings = "Update_CameraSettings" //下发 更新相机设置命令
-
+    val ECHO="echo"
 
     //    address
     val ad_message = "com.iezview.message"
@@ -62,6 +63,7 @@ object cfg {
     val CLIENTS = "clients"
     val ROOT = "server"
     val CameraSetting = "CameraSetting"
+    val CameraNum="CameraNum"
 
     //缩略图大小
     val thumbW = 204.0
@@ -90,8 +92,8 @@ object cfg {
     val is_exists_tb_fileCode = "select count(*) as c from sqlite_master where type='table' and name= ? "
     val query_tb_fileCode = "select * from tb_fileCode f where  f.filecode =?"
     fun query_all_tb_fileCode(sort: Int) = "select * from tb_fileCode f  order by f.create_date ${if (sort == 1) "asc" else "desc"} "
-    val delete_tb_fileCode = "delete from tb_fileCode f where  f.filecode = ?"
-    val update_tb_fileCode = "update tb_fileCode  set pictureNum = ? where  filecode = ?"
+    val delete_tb_fileCode = "delete from tb_fileCode  where  filecode = ?"
+    val update_tb_fileCode = "update tb_fileCode  set pictureNum = ?,states=? where  filecode = ?"
 
     val query_count_tb_fileCode = "select count(id) from tb_fileCode f "
 

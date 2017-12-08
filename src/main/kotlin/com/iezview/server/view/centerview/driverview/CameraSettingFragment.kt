@@ -3,12 +3,8 @@ package com.iezview.server.view.centerview.driverview
 import com.iezview.server.app.cfg
 import com.iezview.server.controller.ClientController
 import com.iezview.server.controls.slider.myslider
-import com.iezview.server.controls.toolbarbutton.toggleswitch
 import com.iezview.server.controls.toolbarbutton.viewbutton
-import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
-import javafx.beans.binding.Bindings
-import javafx.beans.binding.BooleanBinding
 import javafx.geometry.Pos
 import javafx.scene.control.ToggleGroup
 import javafx.scene.layout.Priority
@@ -19,11 +15,9 @@ import tornadofx.*
  */
 class CameraSettingFragment : Fragment("相机设置") {
     val cc: ClientController by inject()
-
     init {
         importStylesheet(CameraSettingFragmentStyle::class)
     }
-
     override val root = borderpane {
         top {
             toolbar {
@@ -106,7 +100,6 @@ class CameraSettingFragmentStyle : Stylesheet() {
     companion object {
         val smallbtn by cssclass()
     }
-
     init {
         field {
             labelContainer {

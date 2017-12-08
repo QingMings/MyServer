@@ -1,12 +1,14 @@
 package com.iezview.server.view.centerview.centerview
 
 import com.iezview.server.controller.ClientController
+import com.iezview.server.controls.toolbarbutton.icon
 import com.iezview.server.view.centerview.driverview.CameraSettingFragment
 import com.iezview.server.view.centerview.driverview.ClientContentFragment
 import javafx.geometry.Side
 import tornadofx.*
+import java.awt.Image
 
-class CenterView : View("My View") {
+class CenterView : View("中心视图") {
     val cc: ClientController by inject()
 
     init {
@@ -17,16 +19,30 @@ class CenterView : View("My View") {
     override val root = splitpane {
         addClass(CenterViewStyle.centerviewstyle)
         drawer(Side.LEFT, true) {
-            item(ClientContentFragment(cc.remoteClients), true, false)
+            item(ClientContentFragment(cc.remoteClients), true, false){
+
+                shortcut("shortcut+F"){
+                    this.expandedProperty.set(this.expandedProperty.get().not())
+                }
+            }
             buttonArea.apply { this.add(hbox { vgrow = javafx.scene.layout.Priority.ALWAYS }) }
-            item(CameraSettingFragment(), false, false)
+            item(CameraSettingFragment(), false, false){
+                shortcut("shortcut+G"){
+                    this.expandedProperty.set(this.expandedProperty.get().not())
+                }
+            }
 //            SplitPane.setResizableWithParent(this, false)
+
             items.forEach { item ->
                 item.expandedProperty.onChange {
                     if (it) {
-                        this@splitpane.setDividerPosition(0, this@drawer.width / this@splitpane.width)
+                        this@splitpane.setDividerPosition(0, this@drawer.maxWidth / this@splitpane.width)
                     } else {
-                        this@splitpane.setDividerPosition(0, 0.0)
+                        //全部为false 时候 隐藏
+                        if(items.stream().allMatch{ it.expanded.not() }){
+                            this@splitpane.setDividerPosition(0, 0.0)
+                        }
+
                     }
                 }
                 item.minWidth = 220.0
@@ -40,7 +56,6 @@ class CenterView : View("My View") {
             top = detiailsBar.root
             center {
                 stackpane {
-//                    add(CameraexposureView::class)
                     add(FileCodeList::class)
                 }
             }

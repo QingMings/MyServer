@@ -1,12 +1,11 @@
 package com.iezview.server.view.centerview.driverview
 
 import com.iezview.server.model.RemoteClient
-import com.iezview.util.Gradient
+import com.iezview.server.util.Gradient
 import javafx.animation.Interpolator
 import javafx.beans.binding.Bindings
 import javafx.geometry.Pos
 import javafx.scene.effect.DropShadow
-import javafx.scene.effect.Glow
 import javafx.scene.paint.Color
 import tornadofx.*
 
@@ -38,10 +37,12 @@ class ClientItemFragment(it: RemoteClient) : Fragment("Client") {
                 hbox {
                     label {
                         //                        textProperty().bind(it.triggerModeProperty())
-                        text = "硬触发"
+                        textProperty().bind(it.triggerModeStrProperty())
                         style {
                             fontSize = 10.px
                             padding = box(3.px, 0.px)
+                            minWidth=30.px
+
                         }
                     }
                 }

@@ -1,9 +1,7 @@
 package animate
 
-import com.iezview.util.Gradient
 import javafx.beans.binding.Bindings
 import javafx.collections.FXCollections
-import javafx.scene.Parent
 import javafx.scene.effect.DropShadow
 import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod

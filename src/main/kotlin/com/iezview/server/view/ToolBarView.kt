@@ -6,16 +6,9 @@ import com.iezview.server.controller.FreeSpaceController
 import com.iezview.server.controller.reportError
 import com.iezview.server.controls.toolbarbutton.runbutton
 import com.iezview.server.controls.toolbarbutton.stopbutton
-import com.iezview.server.controls.toolbarbutton.toggleswitch
 import com.iezview.server.controls.toolbarbutton.toolbarbutton
 import com.iezview.server.util.utils
 import javafx.beans.binding.Bindings
-import javafx.scene.effect.BlurType
-import javafx.scene.effect.DropShadow
-import javafx.scene.paint.Color
-import javafx.scene.paint.CycleMethod
-import javafx.scene.paint.LinearGradient
-import javafx.scene.paint.Stop
 import tornadofx.*
 import java.awt.Desktop
 import java.io.File
@@ -26,7 +19,7 @@ class ToolBarView : View("My View") {
     }
 
     val cc: ClientController by inject()
-    val fsc: FreeSpaceController by inject()
+    private val fsc: FreeSpaceController by inject()
     override val root = toolbar {
         addClass(ToolBarStyle.apptoolBar)
         toolbarbutton("icons/menu-open@2x.png") {
@@ -38,6 +31,7 @@ class ToolBarView : View("My View") {
 //            shortpress { println("Activated on short press") }
 //            longpress { println("Activated on long press") }
         }
+        separator()
         runbutton("icons/execute.png") {
             action { cc.deployTcpServer() }
             runningProperty().bind(cc.vertxRunningProperty())
@@ -49,9 +43,9 @@ class ToolBarView : View("My View") {
             enableWhen(cc.vertxRunningProperty())
             tooltip("停止Server")
         }
-        toolbarbutton("icons/settings@2x.png") {
-            tooltip("设置")
-        }
+//        toolbarbutton("icons/settings@2x.png") {
+//            tooltip("设置")
+//        }
         separator()
         toolbarbutton("icons/dump@2x.png", "icons/dump@2x.png") {
             action {
@@ -112,17 +106,17 @@ class ToolBarStyle : Stylesheet() {
 
         }
 
-        tooltip{
-            backgroundColor= multi(LinearGradient(0.0,0.0,0.0,  .0,true, CycleMethod.NO_CYCLE, Stop(0.0, c("#cec340")), Stop(1.0, c("#a59c31"))),
-                    LinearGradient(0.0,0.0,0.0, 1.0,true, CycleMethod.REPEAT, Stop(0.0, c("#fefefc")), Stop(1.0, c("#e6dd71"))),
-                    LinearGradient(0.0,0.0,0.0, 1.0,true, CycleMethod.REPEAT, Stop(0.0, c("#fef592")), Stop(1.0, c("#e5d848"))))
-            backgroundInsets+= box(0.px,1.px,2.px,2.px)
-            backgroundRadius+= box(0.px,0.px,13.px,0.px)
-            padding= box(0.5.em, 0.5.em,0.5.em,1.7.em)
-            shape="m134,113l47,50l0,-29l0,-26l290,1l0,111l-291,-1l-2,-34l-44,-72z"
-            effect=DropShadow(BlurType.THREE_PASS_BOX, c(0,0,0,0.6),18.0,0.0,0.0,0.0)
-
-        }
+//        tooltip{
+//            backgroundColor= multi(LinearGradient(0.0,0.0,0.0,  .0,true, CycleMethod.NO_CYCLE, Stop(0.0, c("#cec340")), Stop(1.0, c("#a59c31"))),
+//                    LinearGradient(0.0,0.0,0.0, 1.0,true, CycleMethod.REPEAT, Stop(0.0, c("#fefefc")), Stop(1.0, c("#e6dd71"))),
+//                    LinearGradient(0.0,0.0,0.0, 1.0,true, CycleMethod.REPEAT, Stop(0.0, c("#fef592")), Stop(1.0, c("#e5d848"))))
+//            backgroundInsets+= box(0.px,1.px,2.px,2.px)
+//            backgroundRadius+= box(0.px,0.px,13.px,0.px)
+//            padding= box(0.5.em, 0.5.em,0.5.em,1.7.em)
+//            shape="m134,113l47,50l0,-29l0,-26l290,1l0,111l-291,-1l-2,-34l-44,-72z"
+//            effect=DropShadow(BlurType.THREE_PASS_BOX, c(0,0,0,0.6),18.0,0.0,0.0,0.0)
+//
+//        }
 //        tooltip{
 //            pageCorner{
 //                padding= box(0.px)

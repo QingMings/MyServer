@@ -23,7 +23,6 @@ import io.vertx.kotlin.coroutines.awaitResult
 import io.vertx.kotlin.coroutines.dispatcher
 import kotlinx.coroutines.experimental.launch
 import java.nio.file.Paths
-import kotlin.coroutines.experimental.suspendCoroutine
 
 /**
  *  处理库处理
@@ -33,7 +32,7 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
 
     private lateinit var jdbc: JDBCClient
     val cc = clientController
-    val log = LoggerFactory.getLogger(MyJdbc::class.java)
+    private val log = LoggerFactory.getLogger(MyJdbc::class.java)
     suspend override fun start() {
         createDirectories(Paths.get(cfg.db_location))
 
@@ -43,16 +42,15 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
         //判断表是否存在
         val rs = awaitResult<JsonArray> { conn.sqliteTableIsExists(cfg.tb_filecode, it) }
         if (rs.getInteger(0) == 0) {
-
             //表不存在 创建 fileCode表 和fileCode_history 历史表
-            var create_tb_filecode = awaitResult<Void> { conn.execute(cfg.create_tb_fileCode, it) }
+            awaitResult<Void> { conn.execute(cfg.create_tb_fileCode, it) }
             log.info("create table tb_fileCode successed!")
-            var create_tb_filecode_history = awaitResult<Void> { conn.execute(cfg.create_tb_fileCode_history, it) }
+            awaitResult<Void> { conn.execute(cfg.create_tb_fileCode_history, it) }
             log.info("create table tb_fileCode_history successed!")
         } else {
-            var count = awaitResult<JsonArray> { conn.fileCodeCount(it) }
+            val count = awaitResult<JsonArray> { conn.fileCodeCount(it) }
             println("find  FileCode count :${count.getInteger(0)}")
-            var tb_fileCodeRs = awaitResult<ResultSet> { conn.fileCodeList(0, it) }
+            val tb_fileCodeRs = awaitResult<ResultSet> { conn.fileCodeList(0, it) }
             tb_fileCodeRs.results.forEach { println(it.encode()) }
         }
         vertx.eventBus().consumer<JsonObject>(cfg.db_local, this::onMessage)
@@ -61,31 +59,37 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
     /**
      * 获取fileCode
      */
-    fun getfilecode(message: Message<JsonObject>) = message.body().getString(cfg.fileCode)
+    private fun getFileCode(message: Message<JsonObject>) = message.body().getString(cfg.fileCode)
 
-    fun getFileCodes(message: Message<JsonObject>) = JsonArray(message.body().getString(cfg.result))
+    /**
+     * 获取fileCodes
+     */
+    private fun getFileCodes(message: Message<JsonObject>) = JsonArray(message.body().getString(cfg.result))
 
 
     /**
      * 检查table是否存在
      */
-    fun SQLConnection.sqliteTableIsExists(tableName: String, handler: Handler<AsyncResult<JsonArray>>)
+    private fun SQLConnection.sqliteTableIsExists(tableName: String, handler: Handler<AsyncResult<JsonArray>>)
             = this.querySingleWithParams(cfg.is_exists_tb_fileCode, io.vertx.core.json.JsonArray().add(tableName), handler)!!
 
     /**
      * 保存  fileCode
      */
-    fun SQLConnection.saveFileCode(fileCode: String, handler: Handler<AsyncResult<UpdateResult>>)
+    private fun SQLConnection.saveFileCode(fileCode: String, handler: Handler<AsyncResult<UpdateResult>>)
             = this.updateWithParams(cfg.insert_tb_fileCode, io.vertx.core.json.JsonArray().add(fileCode), handler)!!
 
-    fun SQLConnection.updateFileCodes(filecodeParams: List<JsonArray>, handler: Handler<AsyncResult<MutableList<Int>>>) {
+    /**
+     * 批量跟新 fileCode
+     */
+    private fun SQLConnection.updateFileCodes(filecodeParams: List<JsonArray>, handler: Handler<AsyncResult<MutableList<Int>>>) {
         this.batchWithParams(cfg.update_tb_fileCode, filecodeParams, handler)
     }
 
     /**
      * 查找 fileCode
      */
-    fun SQLConnection.findFileCode(fileCode: String, handler: Handler<AsyncResult<JsonObject>>) {
+    private fun SQLConnection.findFileCode(fileCode: String, handler: Handler<AsyncResult<JsonObject>>) {
         queryWithParams(cfg.query_tb_fileCode, io.vertx.kotlin.core.json.JsonArray().add(fileCode)) { execute ->
             if (execute.failed()) {
                 handler.handle(Future.failedFuture<JsonObject>(execute.cause()))
@@ -94,19 +98,21 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
                 if (rs == null) {
                     handler.handle(Future.succeededFuture())
                 } else {
-                    val results = rs!!.rows
+                    val results = rs.rows
                     if (results == null) {
                         handler.handle(Future.succeededFuture())
                     } else {
-                        handler.handle(Future.succeededFuture(results!!.get(0)))
+                        handler.handle(Future.succeededFuture(results[0]))
                     }
                 }
             }
         }
     }
-//             this.querySingleWithParams(cfg.query_tb_fileCode, io.vertx.kotlin.core.json.JsonArray().add(fileCode), handler)
 
-    fun SQLConnection.deleteFileCode(fileCode: String, handler: Handler<AsyncResult<UpdateResult>>)
+    /**
+     * 删除FileCode
+     */
+    private fun SQLConnection.deleteFileCode(fileCode: String, handler: Handler<AsyncResult<UpdateResult>>)
             = this.updateWithParams(cfg.delete_tb_fileCode, io.vertx.core.json.JsonArray().add(fileCode), handler)
 
 
@@ -115,21 +121,24 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
      *  @sort   1  asc   ,
      *          other  desc
      */
-    fun SQLConnection.fileCodeList(sort: Int, handler: Handler<AsyncResult<ResultSet>>) {
+    private fun SQLConnection.fileCodeList(sort: Int, handler: Handler<AsyncResult<ResultSet>>) {
         this.query(cfg.query_all_tb_fileCode(sort), handler)
     }
 
     /**
      * fileCode count
      */
-    fun SQLConnection.fileCodeCount(handler: Handler<AsyncResult<JsonArray>>)
+    private fun SQLConnection.fileCodeCount(handler: Handler<AsyncResult<JsonArray>>)
             = this.querySingle(cfg.query_count_tb_fileCode, handler)
 
-    fun onMessage(message: Message<JsonObject>) {
+    /**
+     * 处理eventBus消息
+     */
+    private fun onMessage(message: Message<JsonObject>) {
         if (message.headers().contains(cfg.dbinfo).not()) {
             message.fail(404, "NoAction header specified!")
         }
-        var action = message.headers().get(cfg.dbinfo)
+        val action = message.headers().get(cfg.dbinfo)
         launch(vertx.dispatcher()) {
             when (action) {
                 cfg.dbcreate -> createFileCode(message)
@@ -143,20 +152,33 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
 
     }
 
-    suspend fun dbUpdateAllFileCode(message: Message<JsonObject>) {
-        var filecodes = getFileCodes(message).toModel<FileCode>()
-        var list = mutableListOf<JsonArray>()
+    /**
+     * 批量更新fileCodes
+     */
+    private suspend fun dbUpdateAllFileCode(message: Message<JsonObject>) {
+        val filecodes = getFileCodes(message).toModel<FileCode>()
+        val list = mutableListOf<JsonArray>()
         try {
-            filecodes.forEach { list.add(JsonArray().add(it.pictureNum).add(it.fileCode)) }
+            //批量更新 拼接参数，判断 fileCode状态
+            filecodes.forEach {
+                list.add(JsonArray().add(it.pictureNum).add(
+                        when {
+                            it.pictureNumProperty().get() == 0 -> FileCode.States.Initail.ordinal
+                            it.pictureNumProperty().get() in 1..(cc.cameraNum - 1) -> FileCode.States.Interrupt.ordinal
+                            it.pictureNumProperty().get() == cc.cameraNum -> FileCode.States.Finish.ordinal
+                            else -> FileCode.States.Finish.ordinal
+                        }
+
+                ).add(it.fileCode))
+            }
             if (list.size > 0) {
-                var conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
-                var result = awaitResult<MutableList<Int>> {
+                val conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
+                val result = awaitResult<MutableList<Int>> {
                     conn.updateFileCodes(list, it)
                     conn.close()
                 }
                 result.forEach { println(it) }
                 message.reply("ok")
-
             }
         } catch (e: Exception) {
             reportQueryError(message, "更新 FileCode 失败", e.cause)
@@ -166,10 +188,10 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
     /**
      * 创建FileCode到数据库
      */
-    suspend fun createFileCode(message: Message<JsonObject>) {
-        var fileCode = getfilecode(message)
+    private suspend fun createFileCode(message: Message<JsonObject>) {
+        val fileCode = getFileCode(message)
         try {
-            var conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
+            val conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
             awaitResult<UpdateResult> {
                 conn.saveFileCode(fileCode, it)
                 conn.close()
@@ -184,10 +206,10 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
     /**
      * 查询所有FileCode
      */
-    suspend fun queryAllFileCode(message: Message<JsonObject>) {
+    private suspend fun queryAllFileCode(message: Message<JsonObject>) {
         try {
-            var conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
-            var rs = awaitResult<ResultSet> {
+            val conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
+            val rs = awaitResult<ResultSet> {
                 conn.fileCodeList(0, it)
                 conn.close()
             }
@@ -197,11 +219,14 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
         }
     }
 
-    suspend fun selectFileCode(message: Message<JsonObject>) {
-        var fileCode = getfilecode(message)
+    /**
+     * 查找fileCode
+     */
+    private suspend fun selectFileCode(message: Message<JsonObject>) {
+        val fileCode = getFileCode(message)
         try {
-            var conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
-            var code = awaitResult<JsonObject> {
+            val conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
+            val code = awaitResult<JsonObject> {
                 conn.findFileCode(fileCode, it)
                 conn.close()
             }
@@ -216,10 +241,10 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
     /**
      * 删除 fileCode
      */
-    suspend fun deleteFileCode(message: Message<JsonObject>) {
+    private suspend fun deleteFileCode(message: Message<JsonObject>) {
         try {
-            var fileCode = getfilecode(message)
-            var conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
+            val fileCode = getFileCode(message)
+            val conn = awaitResult<SQLConnection> { jdbc.getConnection(it) }
             awaitResult<UpdateResult> {
                 conn.deleteFileCode(fileCode, it)
                 conn.close()
@@ -234,7 +259,7 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
     /**
      * 错误报告
      */
-    fun reportQueryError(message: Message<JsonObject>, info: String, cause: Throwable?) {
+    private fun reportQueryError(message: Message<JsonObject>, info: String, cause: Throwable?) {
         log.error("DataBase Error", cause)
         message.fail(404, info);
     }
@@ -244,19 +269,15 @@ class MyJdbc(clientController: ClientController) : CoroutineVerticle() {
      * stop jdbc
      */
     suspend override fun stop() {
-        println("停止了已经")
         try {
             if (cc.filecodes.size > 0) {
-                var c = awaitResult<Message<String>> { cc.updateAllFileCode(it) }
-                if (c.body().equals("ok")) {
-                    println("保存成功")
+                val c = awaitResult<Message<String>> { cc.updateAllFileCode(it) }
+                if (c.body() == "ok") {
+                    log.info("保存成功")
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
-
-
 }

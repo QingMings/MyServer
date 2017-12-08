@@ -1,10 +1,9 @@
-package com.iezview
+package com.iezview.server.vertx
 
 import com.iezview.server.app.cfg
 import com.iezview.server.controller.ClientController
 import com.iezview.server.model.Picture
 import com.iezview.server.util.MB
-import com.iezview.server.util.MyTask
 import com.iezview.server.util.createDirectories
 import com.iezview.server.util.thumbName
 import io.vertx.core.Vertx
@@ -33,21 +32,19 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
     private var cc = cc
     private var bigBuf = Buffer.buffer()
     private var bigBufLen: Int = 0// tempbufferLength
-    //    private fun bigBufProperty()=getProperty(BufferStore::bigBuf)
     private var states = 0 //初始状态     -1 ,累计buffer ,1 处理buffer  , 2 一个包接收完毕或者接收发生错误
     private var tempbuf = Buffer.buffer()
     private var fileInfo = JsonObject()
     private val log = LoggerFactory.getLogger(BufferStore::class.java)
-    var enableReceive = false
-    var    timestart=0L //开始时间
-    var count = 0
+    private var    timestart=0L //开始时间
+    private var count = 0
 
     init {
 //        println("获得连接${socket.remoteAddress().host()} , socketHash:${socket.hashCode()} ")
-        log.info("client:[${socket.toString()}][${socket.remoteAddress().host()}] 获得连接")
+        log.info("client:[$socket][${socket.remoteAddress().host()}] 获得连接")
         cc.remoteClientsProperty().value.filter { it.remoteAddress == socketServer.remoteAddress().host() }.forEach { it.onlineProperty().value = true }
         socketServer.closeHandler {
-            log.info("client:[${socket.toString()}][${socketServer.remoteAddress().host()}] 断开连接")
+            log.info("client:[$socket][${socketServer.remoteAddress().host()}] 断开连接")
             cc.remoteClientsProperty().value.filter { it.remoteAddress == socketServer.remoteAddress().host() }.forEach { it.onlineProperty().value = false }
         }
         socketHandler()
@@ -76,11 +73,11 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
         tempbuf.appendBuffer(buffer)//追加buffer
         fun moreone(tempbuffer: Buffer) {//递归保存
             if (tempbuffer.length() > cfg.Head) {// tempbuf 长度大于包头
-                var fileInfoLength = tempbuffer.getBuffer(cfg.Head, cfg.Head_Info).getInt(0)//获取文件信息长度
+                val fileInfoLength = tempbuffer.getBuffer(cfg.Head, cfg.Head_Info).getInt(0)//获取文件信息长度
                 if (tempbuffer.length() > (cfg.Head_Info + fileInfoLength)) {//判断tempBuf长度是否包含了文件信息
                     fileInfo = tempbuffer.getBuffer(cfg.Head_Info, cfg.Head_Info + fileInfoLength).toJsonObject()//得到文件信息
                     bigBufLen = fileInfo.getLong(cfg.FILE_SIZE).toInt()//得到文件的大小
-                    var dataLength = cfg.Head_Info + fileInfoLength + bigBufLen + cfg.Foot //计算数据包的长度
+                    val dataLength = cfg.Head_Info + fileInfoLength + bigBufLen + cfg.Foot //计算数据包的长度
                     if (tempbuffer.length() >= dataLength) {// tempBuf里不止一个数据包
                         bigBuf.appendBuffer(tempbuffer.getBuffer(cfg.Head_Info + fileInfoLength, dataLength - cfg.Foot))//取得整个数据包
                         log.debug("当前bigBuf的大小：${bigBuf.length()},文件原大小：${fileInfo.getLong(cfg.FILE_SIZE)}")
@@ -123,19 +120,19 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
         if (bigBuf.checkBufferSize(buffer)) {
             bigBuf.appendBuffer(buffer)
         } else {
-            var bufLen = bigBufLen - bigBuf.length()
+            val bufLen = bigBufLen - bigBuf.length()
             if (bufLen < 0) {
                 log.info("接收数据出错 bigBuf.length 大于文件原长度 ，$bufLen")
             }
-            var buf = buffer.getBuffer(0, bufLen + 11)
-            if (buf.endfile()) {
+            val buf = buffer.getBuffer(0, bufLen + 11)
+            if (buf.endFile()) {
                 bigBuf.appendBuffer(buf.end())
                 println("------------------------------" + bigBuf.length())
                 saveFile()
                 bigBufReset()
                 states = 2
 
-                var otherBuf = buffer.getBuffer(bufLen + 11, buffer.length())
+                val otherBuf = buffer.getBuffer(bufLen + 11, buffer.length())
                 when {
                     otherBuf.length() < cfg.Head -> {
 //                        states=1
@@ -149,10 +146,10 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
 //                        tempbuf.appendBuffer(otherBuf)
                         bufferAppend(otherBuf)
                     }
-                    else -> RECEIVE_ERROR()
+                    else -> receiveError()
                 }
             } else {
-                RECEIVE_ERROR()
+                receiveError()
             }
         }
     }
@@ -160,7 +157,7 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
     /**
      * 接收发生错误
      */
-    private fun RECEIVE_ERROR() {
+    private fun receiveError() {
         log.error("处理粘包时候发生错误，跳出当前")
         states = 2
         bigBufReset()
@@ -174,9 +171,9 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
         doCRC32(bigBuf, fileInfo.getLong(cfg.File_CRC32)) {
             if (it) {//CRC32一致 ，保存文件
                 bigBuf.saveFileBlocking(fileInfo)
-                RECEIVE_SUCCESS()
+                receiveSuccess()
                 log.info("文件保存成功, 文件名：${fileInfo.getString(cfg.FILE_NAME)}")
-                var  timenow=System.currentTimeMillis()
+                val  timenow=System.currentTimeMillis()
                 println(timestart)
                 println(timenow)
                 println("耗时${((timenow -timestart)/1000.0)}")
@@ -203,7 +200,7 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
     /**
      * 接收成功
      */
-    private fun RECEIVE_SUCCESS() {
+    private fun receiveSuccess() {
         FrameHelper.sendFrame("send", socket.remoteAddress().host(), JsonObject().put(cfg.success, true), message)
 
     }
@@ -234,11 +231,12 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
         log.debug("保存文件路径：$savepath, 文件来自：${socket.remoteAddress().host()}")
         socket.pause()
         vertx.fileSystem().writeFileBlocking(savepath.toString(), this)
-        var file = File(savepath.toString())
+        val file = File(savepath.toString())
         file.setLastModified(fileInfo.getLong(cfg.FILE_LAST_MODIFIED))//还原 拍摄时间
-        log.debug("${file.name} 保存成功${count} 文件位置${savepath}")
+        log.debug("${file.name} 保存成功$count 文件位置$savepath")
         Thumbnails.of(file).size(cfg.thumbW.toInt(), cfg.teumbH.toInt()).toFile(file.thumbName())
         cc.addPicture(Picture(savepath.toString()))
+        cc.updateFileCodePictureNum(fileInfo.getString(cfg.FILE_CODE),fileInfo.getString(cfg.FILE_NAME))
         socket.resume()
     }
 
@@ -246,13 +244,13 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
      * 校验CRC32
      */
     private fun doCRC32(bigBuf: Buffer, fileCRC: Long, handler: (result: Boolean) -> Unit) {
-        var cis = CheckedInputStream(ByteArrayInputStream(bigBuf.bytes), CRC32())
-        var buf = ByteArray(128)
+        val cis = CheckedInputStream(ByteArrayInputStream(bigBuf.bytes), CRC32())
+        val buf = ByteArray(128)
         while (cis.read(buf) >= 0) {
         }
         log.debug("校验CRC32:${cis.checksum.value} ,原CRC32：$fileCRC,校验结果${cis.checksum.value == fileCRC}")
         if (cis.checksum.value != fileCRC) {
-            println(bigBuf.length())
+            log.debug(bigBuf.length())
         }
         handler(cis.checksum.value == fileCRC)
     }
@@ -260,17 +258,17 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
     /**
      * 判断 是否是数据包的头部
      */
-    private fun Buffer.start() = this.length() >= 13 && this.getBuffer(0, 13).toString().equals(cfg.START_SEND_FILE)
+    private fun Buffer.start() = this.length() >= 13 && this.getBuffer(0, 13).toString() == cfg.START_SEND_FILE
 
     /**
      * 数据包的最后一个buffer
      */
-    private fun Buffer.endfile(): Boolean {
-        if (this.length() >= 11) {
+    private fun Buffer.endFile(): Boolean {
+        return if (this.length() >= 11) {
 
-            return this.getBuffer(this.length() - 11, this.length()).toString().equals(cfg.END_SEND_FILE)
+            this.getBuffer(this.length() - 11, this.length()).toString() == cfg.END_SEND_FILE
         } else {
-            return false
+            false
         }
     }
 

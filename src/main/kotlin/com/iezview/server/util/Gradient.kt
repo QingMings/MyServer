@@ -1,4 +1,4 @@
-package com.iezview.util
+package com.iezview.server.util
 
 import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod

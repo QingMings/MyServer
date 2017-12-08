@@ -9,6 +9,7 @@ import javafx.scene.control.ToggleButton
 import javafx.scene.control.ToolBar
 import javafx.scene.effect.ColorAdjust
 import javafx.scene.image.Image
+import javafx.scene.input.KeyCombination
 import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod
 import javafx.scene.paint.RadialGradient
@@ -23,6 +24,7 @@ class ButtonStyle : Stylesheet() {
     companion object {
         val toolbtn by cssclass()
         val viewtoolbtn by cssclass()
+        val drawertoolbtn by cssclass()
         val segmentbtn by cssclass()
         val firstbtn by cssclass()
         val lastbtn by cssclass()
@@ -30,7 +32,7 @@ class ButtonStyle : Stylesheet() {
 
     init {
         toolbtn {
-            borderWidth += box(1.px)
+            borderWidth += box(0.px,1.px)
             borderColor += box(Color.TRANSPARENT)
             padding = box(2.0.px, 1.0.px)
             borderRadius += box(3.px)
@@ -50,9 +52,24 @@ class ButtonStyle : Stylesheet() {
 //            padding = box(2.0.px, 1.0.px)
             borderRadius += box(3.px)
         }
+        drawertoolbtn {
+            borderWidth += box(0.px,1.px)
+            borderColor += box(Color.TRANSPARENT)
+//            padding = box(2.0.px, 1.0.px)
+            borderRadius += box(3.px)
+            borderInsets+= box(0.px)
+            and(hover) {
+                backgroundColor += Color.web("#d7d7d7")
+                backgroundRadius += box(3.px)
+                borderColor += box(Color.web("#d2d2d2"))
+            }
+            and(pressed) {
+                borderColor += box(Color.web("#d2d2d2"))
+                backgroundColor += Color.web("#c0c0c0")
+            }
 
+        }
         segmentbtn {
-
             backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
             backgroundRadius += box(0.px)
             padding = box(0.4.em, 1.833333.em)
@@ -62,8 +79,8 @@ class ButtonStyle : Stylesheet() {
             backgroundRadius = multi(box(3.px, 0.px, 0.px, 3.px), box(2.px, 0.px, 0.px, 2.px), box(2.px, 0.px, 0.px, 2.px))
         }
         segmentbtn and lastbtn {
-                backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
-                backgroundRadius = multi(box(0.px, 3.px, 3.px, 0.px), box(0.px, 2.px, 2.px, 0.px), box(0.px, 2.px, 2.px, 0.px))
+            backgroundInsets = multi(box(1.px), box(1.px, 1.px, 1.px, 0.px), box(2.px, 1.px, 1.px, 1.px))
+            backgroundRadius = multi(box(0.px, 3.px, 3.px, 0.px), box(0.px, 2.px, 2.px, 0.px), box(0.px, 2.px, 2.px, 0.px))
         }
     }
 }
@@ -73,24 +90,26 @@ class ButtonStyle : Stylesheet() {
  */
 class RunButton(text: String = "") : ToolBarButton(text) {
     constructor() : this("")
-
     var running by property(false)//是否运行
     fun runningProperty() = getProperty(RunButton::running)
 }
 
 /**
  * 工具栏普通功能按钮
+ *
  */
 open class ToolBarButton(text: String = "") : Button(text) {
     constructor() : this("")
-
     init {
         removeClass("button").addClass(ButtonStyle.toolbtn)
     }
-
     override fun getUserAgentStylesheet(): String = ButtonStyle().base64URL.toExternalForm()
 }
 
+/**
+ * drawer item close button
+ *
+ */
 open class ViewBarButton(text: String = "") : ToolBarButton(text) {
     constructor() : this("")
 
@@ -99,10 +118,25 @@ open class ViewBarButton(text: String = "") : ToolBarButton(text) {
     }
 }
 
+/**
+ * drawer item  toolbarButton
+ *
+ */
+class DrawerButton(text: String) : ToolBarButton(text) {
+    constructor() : this("")
+
+    init {
+        removeClass(ButtonStyle.toolbtn).addClass(ButtonStyle.drawertoolbtn)
+    }
+}
+
 enum class Prem {
     Fisrt, Middle, Last
 }
 
+/**
+ * 按钮组
+ */
 open class SegmentedButton(prem: Prem, text: String = "") : ToggleButton(text) {
     init {
         when (prem) {
@@ -112,11 +146,13 @@ open class SegmentedButton(prem: Prem, text: String = "") : ToggleButton(text) {
         }
     }
 
-    override fun getUserAgentStylesheet(): String=ButtonStyle().base64URL.toExternalForm()
+    override fun getUserAgentStylesheet(): String = ButtonStyle().base64URL.toExternalForm()
 }
 
 /**
- *
+ * 工具栏按钮  runbutton
+ *  带有一个小圆点
+ *  当 runproperty 为true 时候，显示绿色
  */
 fun ToolBar.runbutton(iconurl: String? = null, op: (RunButton.() -> Unit)? = null): RunButton {
     val button = RunButton()
@@ -148,6 +184,11 @@ fun ToolBar.runbutton(iconurl: String? = null, op: (RunButton.() -> Unit)? = nul
     return button
 }
 
+/**
+ * 停止按钮
+ * 提供默认图标
+ * 绑定 runproperty
+ */
 fun ToolBar.stopbutton(op: (RunButton.() -> Unit)? = null): RunButton {
     val button = RunButton()
 
@@ -163,8 +204,11 @@ fun ToolBar.stopbutton(op: (RunButton.() -> Unit)? = null): RunButton {
     return button
 }
 
-//fun ToolBar.stopbutton(op: (RunButton.() -> Unit)? = null): RunButton=toolbarbutton("icons/suspend@2x.png","icons/suspend_disable@2x.png",op)
-
+/**
+ * toolbar button
+ * 提供设置一个 icon
+ * icon size 16.0px
+ */
 fun ToolBar.toolbarbutton(iconurl: String? = "", op: (ToolBarButton.() -> Unit)? = null): ToolBarButton {
     val button = ToolBarButton()
     if (iconurl != null)
@@ -175,13 +219,22 @@ fun ToolBar.toolbarbutton(iconurl: String? = "", op: (ToolBarButton.() -> Unit)?
     op?.invoke(button)
     return button
 }
-fun ToolBar.toolbarbutton(enableIconurl: String? = "",disableIconurl: String? = "",op: (RunButton.() -> Unit)? = null): RunButton{
+
+/**
+ * toolbar btn 提供两个icon
+ * enableicon   当  runningProperty ==true 时候显示
+ * disableIcon  当  runningProperty ==false 时候显示
+ *
+ * @ColorAdjust  允许对图标加一些效果
+ *
+ */
+fun ToolBar.toolbarbutton(enableIconurl: String? = "", disableIconurl: String? = "", op: (RunButton.() -> Unit)? = null): RunButton {
     val button = RunButton()
     button.apply {
         button.graphic = imageview {
             imageProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(Image(enableIconurl)).otherwise(Image(disableIconurl)))
             fitWidth = 16.0;fitHeight = 16.0
-            effectProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(ColorAdjust(0.0,0.0,0.0,0.0)).otherwise(ColorAdjust(0.0,-1.0,0.4,0.0)))
+            effectProperty().bind(Bindings.`when`(runningProperty().toBinding()).then(ColorAdjust(0.0, 0.0, 0.0, 0.0)).otherwise(ColorAdjust(0.0, -1.0, 0.4, 0.0)))
         }
     }
     items.add(button)
@@ -189,7 +242,25 @@ fun ToolBar.toolbarbutton(enableIconurl: String? = "",disableIconurl: String? = 
     return button
 }
 
+/**
+ * drawertoolbtn按钮
+ * icon size  14
+ */
+fun ToolBar.drawertoolbtn(iconurl: String, op: (DrawerButton.() -> Unit)? = null): DrawerButton {
+    val button = DrawerButton()
+    if (iconurl != null)
+        button.apply {
+            button.graphic = imageview(Image(iconurl), { fitHeight = 14.0;fitWidth = 14.0 })
+        }
+    items.add(button)
+    op?.invoke(button)
+    return button
+}
 
+/**
+ * drawer  close button
+ *  icon size 14
+ */
 fun ToolBar.viewbutton(iconurl: String? = "", op: (ViewBarButton.() -> Unit)? = null): ViewBarButton {
     val button = ViewBarButton()
     if (iconurl != null)
@@ -201,24 +272,36 @@ fun ToolBar.viewbutton(iconurl: String? = "", op: (ViewBarButton.() -> Unit)? = 
     return button
 }
 
-fun ToolBar.segmentedbutton(op:(org.controlsfx.control.SegmentedButton.()->Unit)):org.controlsfx.control.SegmentedButton{
-    val  button =org.controlsfx.control.SegmentedButton()
+/**
+ * 按钮组
+ */
+fun ToolBar.segmentedbutton(op: (org.controlsfx.control.SegmentedButton.() -> Unit)): org.controlsfx.control.SegmentedButton {
+    val button = org.controlsfx.control.SegmentedButton()
     items.add(button)
     op.invoke(button)
     return button
 }
 
-fun  EventTarget.toggleswitch(text: String,op:(ToggleSwitch.()->Unit)):ToggleSwitch=opcr(this, ToggleSwitch(text), op)
+/**
+ *
+ */
+fun EventTarget.toggleswitch(text: String, op: (ToggleSwitch.() -> Unit)): ToggleSwitch = opcr(this, ToggleSwitch(text), op)
 //{
 //    var  toggleSwitch =ToggleSwitch(text)
 //     op.invoke(toggleSwitch)
 //    return toggleSwitch
 //}
 
-fun  ToolBar.toggleswitch(text: String,op:(ToggleSwitch.()->Unit)):ToggleSwitch{
-    var  toggleSwitch =ToggleSwitch(text)
+fun ToolBar.toggleswitch(text: String, op: (ToggleSwitch.() -> Unit)): ToggleSwitch {
+    var toggleSwitch = ToggleSwitch(text)
     items.add(toggleSwitch)
     op.invoke(toggleSwitch)
     return toggleSwitch
 }
+
+/**
+ * 包装了imageview
+ * 返回 Imageview
+ */
+fun EventTarget.icon(iconurl: String) = imageview(iconurl, false, { fitHeight = 14.0;fitWidth = 14.0 })
 

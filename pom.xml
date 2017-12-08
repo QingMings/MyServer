@@ -153,6 +153,8 @@
             <version>3.5.0</version>
             <scope>test</scope>
         </dependency>
+
+
     </dependencies>
 
     <build>
@@ -184,6 +186,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <experimentalCoroutines>enable</experimentalCoroutines>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -253,6 +258,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

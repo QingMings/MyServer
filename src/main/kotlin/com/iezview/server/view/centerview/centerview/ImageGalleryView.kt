@@ -18,27 +18,26 @@ import tornadofx.*
 /**
  * 缩略图预览列表
  */
-class ImageGalleryView : View("My View") {
+class ImageGalleryView : View("缩略图预览列表") {
     val cc: ClientController by inject()
-    override val root =borderpane {
-        center  =  scrollpane {
-                stackpane {
-                    flowpane {
-                        bindComponents(cc.pictures) { ImageBoxFragment(it) }
-                        vgap = 2.0;hgap = 2.0; hgrow = Priority.ALWAYS
-                    }
+    override val root = borderpane {
+        center = scrollpane {
+            stackpane {
+                flowpane {
+                    bindComponents(cc.pictures) { ImageBoxFragment(it) }
+                    vgap = 2.0;hgap = 2.0; hgrow = Priority.ALWAYS
                 }
-                isFitToWidth = true
-                isFitToHeight
             }
-
-         bottom {
-             hbox {
-                 label("接收照片数量：")
-                 label { textProperty().bind(cc.pictures.sizeProperty.asString()) }
-                 label("  张")
-             }
-         }
+            isFitToWidth = true
+            isFitToHeight
+        }
+        bottom {
+            hbox {
+                label("接收照片数量：")
+                label { textProperty().bind(cc.pictures.sizeProperty.asString()) }
+                label("  张")
+            }
+        }
     }
 }
 
@@ -120,4 +119,4 @@ class ImageBoxFragment(picture: Picture) : Fragment() {
     }
 }
 
-fun  Image.center()=Point2D(this.width/2,this.height/2)
+fun Image.center() = Point2D(this.width / 2, this.height / 2)

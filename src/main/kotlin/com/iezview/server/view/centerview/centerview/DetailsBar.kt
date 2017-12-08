@@ -6,7 +6,7 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Priority
 import tornadofx.*
 
-class DetailsBar : View("My View") {
+class DetailsBar : View("右侧工具条") {
     init {
         importStylesheet(DetailsBarStyle::class)
     }
@@ -21,7 +21,9 @@ class DetailsBar : View("My View") {
             segmentedbutton {
                 apply {
                     this.buttons.addAll(
+
                             togglebutton {
+                                    shortcut("shortcut+1"){ fire() }
                                 tooltip("预览视图")
                                 addClass(DetailsBarStyle.tooglebtn)
                                 graphic = imageview(Image("icons/listdetails.png")) { fitHeight = 12.0;fitWidth = 12.0 }
@@ -31,6 +33,7 @@ class DetailsBar : View("My View") {
                             }
                             ,
                             togglebutton {
+                                shortcut("shortcut+2"){ fire() }
                                 tooltip("表格视图")
                                 addClass(DetailsBarStyle.tooglebtn)
                                 graphic = imageview(Image("icons/list.png")) { fitHeight = 12.0;fitWidth = 12.0 }
@@ -38,6 +41,7 @@ class DetailsBar : View("My View") {
                             }
                             ,
                             togglebutton {
+                                shortcut("shortcut+3"){ fire() }
                                 tooltip("曝光列表")
                                 addClass(DetailsBarStyle.tooglebtn)
                                 graphic = imageview(Image("icons/list.png")) { fitHeight = 12.0;fitWidth = 12.0 }

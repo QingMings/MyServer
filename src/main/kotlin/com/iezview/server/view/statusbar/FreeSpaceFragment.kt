@@ -2,7 +2,6 @@ package com.iezview.server.view.statusbar
 
 import com.iezview.server.controller.FreeSpaceController
 import javafx.animation.Timeline
-import javafx.beans.binding.Bindings
 import javafx.scene.paint.Color
 import javafx.util.Duration
 import javafx.util.StringConverter
@@ -12,7 +11,7 @@ import tornadofx.*
  * 磁盘空间
  */
 class FreeSpaceFragment : Fragment("剩余空间") {
-    val fsc: FreeSpaceController by inject()
+    private val fsc: FreeSpaceController by inject()
 
     init {
         importStylesheet(FreeSpaceViewStyle::class)
@@ -54,7 +53,6 @@ class FreeSpaceViewStyle : Stylesheet() {
         val redFont by cssclass()
         val leftPadding by cssclass()
     }
-
     init {
         redFont {
             textFill = Color.RED

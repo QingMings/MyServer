@@ -9,10 +9,7 @@ import java.io.File
  * 照片
  */
 class Picture(spath:String,sname:String="") {
-
-    constructor(spath: String):this(spath,sname = ""){
-
-    }
+    constructor(spath: String):this(spath,sname = "")
     /**
      * 文件路径
      */
@@ -40,7 +37,6 @@ class Picture(spath:String,sname:String="") {
     fun thumbpathProperty() =getProperty(Picture::thumbpath)
     var  invalid=false
     init {
-
         var file =File(spath)
         if (file.exists().and(file.isFile).and(file.isHidden.not())) {
             path=spath

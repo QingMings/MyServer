@@ -8,7 +8,6 @@ class DriverViewStyle : Stylesheet() {
         val viewtoolBar by cssclass()
         val clientlistview by cssclass()
     }
-
     init {
         root {
             viewtoolBar {
@@ -19,8 +18,6 @@ class DriverViewStyle : Stylesheet() {
                 backgroundColor += Color.TRANSPARENT
                 borderWidth += box(0.px)
             }
-
-
         }
     }
 }
