@@ -13,6 +13,7 @@ import io.vertx.core.logging.LoggerFactory
 import io.vertx.core.net.NetSocket
 import io.vertx.ext.eventbus.bridge.tcp.impl.protocol.FrameHelper
 import net.coobird.thumbnailator.Thumbnails
+import sun.misc.CRC16
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.nio.file.Paths
@@ -245,6 +246,9 @@ class BufferStore(vertx: Vertx, socketServer: NetSocket, socketClient: NetSocket
      */
     private fun doCRC32(bigBuf: Buffer, fileCRC: Long, handler: (result: Boolean) -> Unit) {
         val cis = CheckedInputStream(ByteArrayInputStream(bigBuf.bytes), CRC32())
+
+        CRC16()
+
         val buf = ByteArray(128)
         while (cis.read(buf) >= 0) {
         }

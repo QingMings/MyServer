@@ -2,7 +2,7 @@
   "server": {
     "filePort": 9999,
     "messagePort": 9000,
-    "savePath": "/Users/shishifanbuxie/IdeaProjects/MyServer/receivefiles/",
+    "savePath": "/Users/shishifanbuxie/IdeaProjects/MyServer/receivefiles2/",
 //        "savePath": "C:/",
     "clients": [
       "192.168.1.205",

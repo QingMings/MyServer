@@ -22,6 +22,8 @@ class MyApp: App(MainView::class, Styles::class){
          * 设置全局异常处理
          */
         Thread.setDefaultUncaughtExceptionHandler(DefaultErrorHandler())
+
+        System.getProperties().setProperty("vertx.cacheDirBase",cfg.FileCache_Location)
     }
     
     override fun start(stage: Stage) {

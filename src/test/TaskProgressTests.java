@@ -1,7 +1,3 @@
-
-
-
-import io.vertx.ext.unit.junit.RunTestOnContext;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -103,6 +99,11 @@ public class TaskProgressTests extends Application {
             @Override
             protected void failed() {
                 System.out.println("失败了");
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                System.out.println("sssdfs");
             }
         };
     }

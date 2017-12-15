@@ -23,7 +23,14 @@ class DetailsListView : View("详细列表") {
                         text = LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     }
             column("大小", Picture::size)
+                    //测试  整行 换色
+//                    .cellFormat {
+//                 tableRow.style="-fx-background-color:#8b0000; -fx-text-fill:white"
+//                text=it
+//            }
+
             style { padding = box(0.px) }
+
             selectionModel.selectionMode = SelectionMode.MULTIPLE
         }
 

@@ -106,9 +106,9 @@ fun String.toURL()=Paths.get(this).toUri().toURL()
  * 在运行时目录下的 ".temp" 文件夹下
  */
 fun File.thumbName(): String {
-    var tempdir = File("${System.getProperty("user.dir")}/.temp")
+    var tempdir = File("${cfg.temp_location}")
     if (tempdir.exists().not())  tempdir.mkdirs()
-    return "${System.getProperty("user.dir")}/.temp/${this.nameWithoutExtension}_${cfg.teumbSuffix}.${this.extension}"
+    return "${cfg.temp_location}/${this.nameWithoutExtension}_${cfg.teumbSuffix}.${this.extension}"
 }
 
 /**

@@ -3,6 +3,7 @@ package com.iezview.server.controller
 import com.iezview.server.vertx.MyServer
 import com.iezview.server.app.cfg
 import com.iezview.server.model.*
+import com.iezview.server.util.createDirectories
 import com.iezview.server.util.toModel
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetrieverOptions
@@ -26,6 +27,8 @@ import javafx.scene.control.ButtonType
 import javafx.util.Duration
 import org.controlsfx.control.Notifications
 import tornadofx.*
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * clients  控制器，
@@ -84,11 +87,12 @@ class ClientController : Controller() {
      */
     val cameraSettingModel: CameraSettingModel by inject()
     //读取外部配置文件
-    var options = ConfigStoreOptions().setType("file").setFormat("json").setConfig(JsonObject().put("path", "development.json"))
+    var options = ConfigStoreOptions().setType("file").setFormat("json").setConfig(JsonObject().put("path", "${cfg.config_location}/development.json"))
     var retriever = ConfigRetriever.create(vertx, ConfigRetrieverOptions().setScanPeriod(2000).addStore(options))
     private val logg = LoggerFactory.getLogger(ClientController::class.java)
 
     init {
+        initDirConfig()
         //读取配置文件
         retriever.getConfig {
             if (it.failed()) {
@@ -207,6 +211,7 @@ class ClientController : Controller() {
 
     fun deployTcpServer() {
         if (!vertxRunning) {
+
             vertx.deployVerticle(MyServer(this), deployOptions) {
                 if (it.succeeded()) {
                     startServer()
@@ -402,6 +407,16 @@ class ClientController : Controller() {
             }
         }
 //        println(System.getProperty("user.dir"))
+    }
+
+    fun  initDirConfig(){
+        createDirectories(Paths.get(cfg.log_location))
+        createDirectories(Paths.get(cfg.temp_location))
+        createDirectories(Paths.get(cfg.config_location))
+        if(Files.notExists(Paths.get(cfg.config_location).resolve("development.json"))){
+            var buffer=  vertx.fileSystem().readFileBlocking("development.json")
+            vertx.fileSystem().writeFileBlocking("${cfg.config_location}/development.json",buffer)
+        }
     }
 
     /**

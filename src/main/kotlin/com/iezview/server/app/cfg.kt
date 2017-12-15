@@ -82,6 +82,10 @@ object cfg {
     //运行时配置
     val Conf = "${System.getProperty("user.home")}/.myServer"
     val db_location= "$Conf/db/"
+    val log_location="$Conf/log"
+    val temp_location ="$Conf/.temp"
+    val config_location ="$Conf/.conf"
+    val FileCache_Location="$Conf/.vertx"
 
     // 建表语句
     val dbConfig = arrayOf("url" to "jdbc:sqlite:${db_location}myserver.db", "driver_class" to "org.sqlite.JDBC", "max_pool_size" to 30, "username" to "myserver", "password" to "123456")

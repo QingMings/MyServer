@@ -48,21 +48,21 @@ class FileCodeList : View("FileCodeList") {
                         }
                     }
                     separator()
-                    item("重新上传照片"){
-                        setOnShown {
-                            //判断 FileCode状态，正在传输的不允许重新上传
-                           if (selectedItem!=null){
-                               isDisable = (selectedItem as FileCode).statesProperty().get()==FileCode.States.Continued
-                           }
-                        }
-                        setOnAction {
-                            if(selectedItem != null ){
-                                cc.pushMessageWithCodeFetch(cfg.Fetch_Server,(selectedItem as FileCode).fileCode)
-                            }
-
-                        }
-
-                    }
+//                    item("重新上传照片"){
+//                        setOnShown {
+//                            //判断 FileCode状态，正在传输的不允许重新上传
+//                           if (selectedItem!=null){
+//                               isDisable = (selectedItem as FileCode).statesProperty().get()==FileCode.States.Continued
+//                           }
+//                        }
+//                        setOnAction {
+//                            if(selectedItem != null ){
+//                                cc.pushMessageWithCodeFetch(cfg.Fetch_Server,(selectedItem as FileCode).fileCode)
+//                            }
+//
+//                        }
+//
+//                    }
                     item("删除", KeyCombination.keyCombination("SHIFT+DELETE")){
                         setOnShown {
                             if (selectedItem!=null){
