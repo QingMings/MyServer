@@ -127,7 +127,7 @@ class MyServer(clientController: ClientController) : AbstractVerticle() {
             cc.remoteClients.filter { it.remoteAddress == message.body().getString(cfg.Client_address) }.forEach {
                 it.messageTypeProperty().set(message.body()[cfg.messageType])
                 it.messageStatesProperty().set(message.body().getString(cfg.messageState))
-                if(message.body().getString(cfg.cameraMode).isNotEmpty()) it.triggerModeStrProperty().set(message.body().getString(cfg.cameraMode))
+                it.triggerModeStrProperty().set(if(message.body().getInteger(cfg.cameraMode)==1) "硬触发" else "软触发")
                 it.rProperty().set(message.body().getString(cfg.R))
             }
         }

@@ -71,6 +71,9 @@ class ClientItemFragment(it: RemoteClient) : Fragment("Client") {
                     var fade = fade(3.seconds, 0, Interpolator.EASE_OUT, false, false)
                     label {
                         textProperty().bind(it.messageTypeProperty())
+                        style{
+                            padding=box(0.px,8.px)
+                        }
                     }
                     label {
                         textProperty().bind(it.messageStatesProperty())
